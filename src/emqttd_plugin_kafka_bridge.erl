@@ -311,15 +311,15 @@ ekaf_init(_Env) ->
 
 %% Called when the plugin application stop
 unload() ->
-    emqttd:unhook('client.connected', fun ?MODULE:on_client_connected/3, [Env]),
-    emqttd:unhook('client.disconnected', fun ?MODULE:on_client_disconnected/3, [Env]),
-    emqttd:unhook('client.subscribe', fun ?MODULE:on_client_subscribe/4, [Env]),
-    emqttd:unhook('client.unsubscribe', fun ?MODULE:on_client_unsubscribe/4, [Env]),
-    emqttd:unhook('session.created', fun ?MODULE:on_session_created/3, [Env]),
-    emqttd:unhook('session.subscribed', fun ?MODULE:on_session_subscribed/4, [Env]),
-    emqttd:unhook('session.unsubscribed', fun ?MODULE:on_session_unsubscribed/4, [Env]),
-    emqttd:unhook('session.terminated', fun ?MODULE:on_session_terminated/4, [Env]),
-    emqttd:unhook('message.publish', fun ?MODULE:on_message_publish/2, [Env]),
-    emqttd:unhook('message.delivered', fun ?MODULE:on_message_delivered/4, [Env]),
-    emqttd:unhook('message.acked', fun ?MODULE:on_message_acked/4, [Env]).
+    emqttd:unhook('client.connected', fun ?MODULE:on_client_connected/3),
+    emqttd:unhook('client.disconnected', fun ?MODULE:on_client_disconnected/3),
+    emqttd:unhook('client.subscribe', fun ?MODULE:on_client_subscribe/4),
+    emqttd:unhook('client.unsubscribe', fun ?MODULE:on_client_unsubscribe/4),
+    emqttd:unhook('session.created', fun ?MODULE:on_session_created/3),
+    emqttd:unhook('session.subscribed', fun ?MODULE:on_session_subscribed/4),
+    emqttd:unhook('session.unsubscribed', fun ?MODULE:on_session_unsubscribed/4),
+    emqttd:unhook('session.terminated', fun ?MODULE:on_session_terminated/4),
+    emqttd:unhook('message.publish', fun ?MODULE:on_message_publish/2),
+    emqttd:unhook('message.delivered', fun ?MODULE:on_message_delivered/4),
+    emqttd:unhook('message.acked', fun ?MODULE:on_message_acked/4).
 
