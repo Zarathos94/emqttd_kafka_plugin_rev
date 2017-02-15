@@ -131,14 +131,14 @@ on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
 %%-----------client unsubscribed start----------------------------------------%%
 
 on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
-    io:format("client ~s unsubscribe ~p~n", [ClientId, Topics]),
+    io:format("client ~s(~s) unsubscribe ~p~n", [ClientId, Username, TopicTable]),
 
     % build json to send using ClientId
     Json = mochijson2:encode([
         {type, <<"unsubscribed">>},
         {client_id, ClientId},
         {username, Username},
-        {topic, lists:last(Topics)},
+        {topic, lists:last(TopicTable)},
         {cluster_node, node()},
         {ts, emqttd_time:now_to_secs()}
     ]),
@@ -188,7 +188,7 @@ on_session_created(ClientId, Username, _Env) ->
         {client_id, ClientId},
         {username, Username},
         {cluster_node, node()},
-        {ts, emqttd_time::now_to_secs(Timestamp)}
+        {ts, emqttd_time:now_to_secs()}
     ]),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
 
@@ -200,7 +200,7 @@ on_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
         {username, Username},
         {topic, Topic},
         {cluster_node, node()},
-        {ts, emqttd_time::now_to_secs(Timestamp)}
+        {ts, emqttd_time:now_to_secs()}
     ]),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     {ok, {Topic, Opts}}.
@@ -211,9 +211,9 @@ on_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
         {type, <<"session_unsubscribed">>},
         {client_id, ClientId},
         {username, Username},
-        {topic, Topic},
+        {topic, {Topic, Opts}},
         {cluster_node, node()},
-        {ts, emqttd_time::now_to_secs(Timestamp)}
+        {ts, emqttd_time:now_to_secs()}
     ]),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     ok.
@@ -226,7 +226,7 @@ on_session_terminated(ClientId, Username, Reason, _Env) ->
         {username, Username},
         {reason, Reason},
         {cluster_node, node()},
-        {ts, emqttd_time::now_to_secs(Timestamp)}
+        {ts, emqttd_time:now_to_secs()}
     ]),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),.
 
