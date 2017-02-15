@@ -215,7 +215,7 @@ on_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
         {type, <<"session_unsubscribed">>},
         {client_id, ClientId},
         {username, Username},
-        {topic, {Topic, Opts}},
+        {topic, Topic},
         {cluster_node, node()},
         {ts, emqttd_time:now_to_secs()}
     ]),
