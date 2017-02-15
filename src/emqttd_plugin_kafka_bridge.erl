@@ -141,7 +141,7 @@ on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
                 {type, <<"unsubscribed">>},
                 {client_id, ClientId},
                 {username, Username},
-                {topic, lists:last(TopicTable)},
+                {topic, lists:last(Key)},
                 {cluster_node, node()},
                 {ts, emqttd_time:now_to_secs()}
             ]),
