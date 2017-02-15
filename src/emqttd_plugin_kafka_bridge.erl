@@ -301,7 +301,7 @@ ekaf_init(_Env) ->
     %% Set topic
     application:set_env(ekaf, ekaf_bootstrap_topics, <<"broker_message">>),
 
-    %{ok, _} = application:ensure_all_started(kafkamocker),
+    {ok, _} = application:ensure_all_started(kafkamocker),
     {ok, _} = application:ensure_all_started(gproc),
     {ok, _} = application:ensure_all_started(ranch),
     {ok, _} = application:ensure_all_started(ekaf),
