@@ -19,11 +19,6 @@
 %%% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 %%% SOFTWARE.
 %%%-----------------------------------------------------------------------------
-%%% @doc
-%%% emqttd_plugin_kafka_bridge.
-%%%
-%%% @end
-%%%-----------------------------------------------------------------------------
 -module(emqttd_plugin_kafka_bridge).
 
 -include("../../emqttd/include/emqttd.hrl").
@@ -80,7 +75,7 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
 
 %%-----------client disconnect start---------------------------------%%
 
-on_client_disconnected(Reason, ClientId, _Env) ->
+on_client_disconnected(Reason, _Client = #mqtt_client{client_id = ClientId}, _Env) ->
     io:format("client ~s disconnected, reason: ~w~n", [ClientId, Reason]),
 
     Json = mochijson2:encode([
