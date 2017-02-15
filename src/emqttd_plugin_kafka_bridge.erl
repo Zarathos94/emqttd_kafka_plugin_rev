@@ -26,11 +26,11 @@
 %%%-----------------------------------------------------------------------------
 -module(emqttd_plugin_kafka_bridge).
 
--include("../../../include/emqttd.hrl").
+-include("../emqttd/include/emqttd.hrl").
 
--include("../../../include/emqttd_protocol.hrl").
+-include("../emqttd/include/emqttd_protocol.hrl").
 
--include("../../../include/emqttd_internal.hrl").
+-include("../emqttd/include/emqttd_internal.hrl").
 
 -export([load/1, unload/0]).
 
@@ -40,8 +40,6 @@
 -export([on_client_subscribe/3, on_client_subscribe_after/3, on_client_unsubscribe/3]).
 
 -export([on_message_publish/2, on_message_delivered/3, on_message_acked/3]).
-
--record(struct, {lst=[]}).
 
 %% Called when the plugin application start
 load(Env) ->
@@ -162,7 +160,7 @@ on_message_publish(Message, _Env) ->
     io:format("publish ~s~n", [emqttd_message:format(Message)]),   
 
     From = Message#mqtt_message.from,
-    Sender =  Message#mqtt_message.sender,
+    %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload, 
     QoS = Message#mqtt_message.qos,
@@ -187,7 +185,7 @@ on_message_delivered(ClientId, Message, _Env) ->
     io:format("delivered to client ~s: ~s~n", [ClientId, emqttd_message:format(Message)]),
 
     From = Message#mqtt_message.from,
-    Sender =  Message#mqtt_message.sender,
+    %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload, 
     QoS = Message#mqtt_message.qos,
@@ -214,7 +212,7 @@ on_message_acked(ClientId, Message, _Env) ->
     io:format("client ~s acked: ~s~n", [ClientId, emqttd_message:format(Message)]),   
 
     From = Message#mqtt_message.from,
-    Sender =  Message#mqtt_message.sender,
+    %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload, 
     QoS = Message#mqtt_message.qos,
