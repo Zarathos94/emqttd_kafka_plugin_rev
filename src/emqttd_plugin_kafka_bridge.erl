@@ -131,7 +131,7 @@ on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
 %%-----------client unsubscribed start----------------------------------------%%
 
 on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
-    %io:format("client ~s(~s) unsubscribe ~p~n", [ClientId, Username, TopicTable]),
+    io:format("client ~s(~s) unsubscribe ~p~n", [ClientId, Username, TopicTable]),
     case TopicTable of
         [_|_] -> 
             %% If TopicTable list is not empty
@@ -147,7 +147,7 @@ on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
             ]),
             ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
         _ -> 
-                %% If TopicTable is empty
+            %% If TopicTable is empty
             io:format("empty topic ~n")
     end,
     
