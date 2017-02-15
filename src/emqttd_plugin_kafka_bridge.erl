@@ -279,7 +279,7 @@ on_message_acked(ClientId, Username, Message, _Env) ->
         {type, <<"acked">>},
         {client_id, ClientId},
         {username, Username},
-        {sender_id, SenderId}
+        {sender_id, SenderId},
         {sender_name, SenderName},
         {topic, Topic},
         {payload, Payload},
