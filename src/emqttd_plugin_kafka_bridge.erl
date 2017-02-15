@@ -19,6 +19,8 @@
 %%% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 %%% SOFTWARE.
 %%%-----------------------------------------------------------------------------
+%%% @end
+%%%-----------------------------------------------------------------------------
 -module(emqttd_plugin_kafka_bridge).
 
 -include("../../emqttd/include/emqttd.hrl").
@@ -145,7 +147,6 @@ on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
 %%-----------client unsubscribed end----------------------------------------%%
 
 
-
 %%-----------message publish start--------------------------------------%%
 
 %% transform message and return
@@ -169,7 +170,7 @@ on_message_publish(Message, _Env) ->
         {payload, Payload},
         {qos, QoS},
         {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs(Timestamp)}
+        {ts, Timestamp}
     ]),
 
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -183,7 +184,7 @@ on_session_created(ClientId, Username, _Env) ->
         {client_id, ClientId},
         {username, Username},
         {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
+        {ts, Timestamp}
     ]),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
 
@@ -195,7 +196,7 @@ on_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
         {username, Username},
         {topic, Topic},
         {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
+        {ts, Timestamp}
     ]),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     {ok, {Topic, Opts}}.
@@ -208,7 +209,7 @@ on_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
         {username, Username},
         {topic, {Topic, Opts}},
         {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
+        {ts, Timestamp}
     ]),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     ok.
@@ -221,7 +222,7 @@ on_session_terminated(ClientId, Username, Reason, _Env) ->
         {username, Username},
         {reason, Reason},
         {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
+        {ts, Timestamp}
     ]),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
 
@@ -246,7 +247,7 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
         {payload, Payload},
         {qos, QoS},
         {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs(Timestamp)}
+        {ts, Timestamp}
     ]),
 
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -274,7 +275,7 @@ on_message_acked(ClientId, Username, Message, _Env) ->
         {payload, Payload},
         {qos, QoS},
         {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs(Timestamp)}
+        {ts, Timestamp}
     ]),
 
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
