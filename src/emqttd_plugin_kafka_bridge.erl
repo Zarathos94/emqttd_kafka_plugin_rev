@@ -61,7 +61,7 @@ load(Env) ->
 %%-----------client connect start-----------------------------------%%
 
 on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env) ->
-    io:format("client ~s connected, connack: ~w~n", [ClientId, ConnAck]),
+    %io:format("client ~s connected, connack: ~w~n", [ClientId, ConnAck]),
 
     Json = mochijson2:encode([
         {type, <<"connected">>},
@@ -81,7 +81,7 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
 %%-----------client disconnect start---------------------------------%%
 
 on_client_disconnected(Reason, _Client = #mqtt_client{client_id = ClientId}, _Env) ->
-    io:format("client ~s disconnected, reason: ~w~n", [ClientId, Reason]),
+    %io:format("client ~s disconnected, reason: ~w~n", [ClientId, Reason]),
 
     Json = mochijson2:encode([
         {type, <<"disconnected">>},
@@ -103,7 +103,7 @@ on_client_disconnected(Reason, _Client = #mqtt_client{client_id = ClientId}, _En
 
 %% should retain TopicTable
 on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
-    io:format("client ~s subscribed ~p~n", [ClientId, TopicTable]),
+    %io:format("client ~s subscribed ~p~n", [ClientId, TopicTable]),
     case TopicTable of
         [_|_] -> 
             %% If TopicTable list is not empty
@@ -131,24 +131,27 @@ on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
 %%-----------client unsubscribed start----------------------------------------%%
 
 on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
-    io:format("client ~s(~s) unsubscribe ~p~n", [ClientId, Username, TopicTable]),
-
-    % build json to send using ClientId
-    Json = mochijson2:encode([
-        {type, <<"unsubscribed">>},
-        {client_id, ClientId},
-        {username, Username},
-        {topic, lists:last(TopicTable)},
-        {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
-    ]),
-    
-    ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
+    %io:format("client ~s(~s) unsubscribe ~p~n", [ClientId, Username, TopicTable]),
+    case TopicTable of
+        [_|_] -> 
+            %% If TopicTable list is not empty
+            Key = proplists:get_keys(TopicTable),
+            %% build json to send using ClientId
+            Json = mochijson2:encode([
+                {type, <<"unsubscribed">>},
+                {client_id, ClientId},
+                {username, Username},
+                {topic, lists:last(TopicTable)},
+                {cluster_node, node()},
+                {ts, emqttd_time:now_to_secs()}
+            ]),
+            ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
+        _ -> 
+                %% If TopicTable is empty
+            io:format("empty topic ~n")
+    end,
     
     {ok, TopicTable}.
-
-%%-----------client unsubscribed end----------------------------------------%%
-
 
 
 %%-----------message publish start--------------------------------------%%
@@ -160,7 +163,7 @@ on_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>}, _Env)
 on_message_publish(Message, _Env) ->
     io:format("publish ~s~n", [emqttd_message:format(Message)]),   
 
-    From = Message#mqtt_message.from,
+    {ClientId, Username} = Message#mqtt_message.from,
     %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload, 
@@ -169,7 +172,8 @@ on_message_publish(Message, _Env) ->
 
     Json = mochijson2:encode([
         {type, <<"published">>},
-        {client_id, From},
+        {client_id, ClientId},
+        {username, Username},
         {topic, Topic},
         {payload, Payload},
         {qos, QoS},
@@ -235,7 +239,7 @@ on_session_terminated(ClientId, Username, Reason, _Env) ->
 on_message_delivered(ClientId, Username, Message, _Env) ->
     io:format("delivered to client ~s: ~s~n", [ClientId, emqttd_message:format(Message)]),
 
-    From = Message#mqtt_message.from,
+    {SenderId, SenderName} = Message#mqtt_message.from,
     %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload, 
@@ -245,7 +249,8 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
     Json = mochijson2:encode([
         {type, <<"delivered">>},
         {client_id, ClientId},
-        {from, From},
+        {sender_id, SenderId},
+        {sender_name, SenderName},
         {username, Username},
         {topic, Topic},
         {payload, Payload},
@@ -263,7 +268,7 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
 on_message_acked(ClientId, Username, Message, _Env) ->
     io:format("client ~s acked: ~s~n", [ClientId, emqttd_message:format(Message)]),   
 
-    From = Message#mqtt_message.from,
+    {SenderId, SenderName} = Message#mqtt_message.from,
     %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload, 
@@ -274,7 +279,8 @@ on_message_acked(ClientId, Username, Message, _Env) ->
         {type, <<"acked">>},
         {client_id, ClientId},
         {username, Username},
-        {from, From},
+        {sender_id, SenderId}
+        {sender_name, SenderName},
         {topic, Topic},
         {payload, Payload},
         {qos, QoS},
