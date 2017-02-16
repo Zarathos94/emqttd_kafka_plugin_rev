@@ -17,7 +17,7 @@ git submodule update --remote plugins/emqttd_plugin_kafka_bridge
 Orelse:
 
 ```
-git submodule add https://github.com/Zarathos94/emqttd_plugin_kafka_bridge.git plugins/emqttd_plugin_kafka_bridge
+git submodule add https://github.com/Zarathos94/emqttd_kafka_plugin_rev.git plugins/emqttd_plugin_kafka_bridge
 ```
 
 And then build emqttd project.
