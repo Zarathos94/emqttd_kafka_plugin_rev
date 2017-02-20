@@ -156,11 +156,10 @@ on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
 on_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>}, _Env) ->
     {ok, Message};
 
-on_message_publish(Message, _Env) ->
+on_message_publish(Message#mqtt_message{ id = MessageId, retain = Retain, topic = Topic,
+payload = Payload, qos = QoS, from = {ClientId, Username}, pktid = PacketId}, _Env) ->
     io:format("publish ~s~n", [emqttd_message:format(Message)]),
 
-    Message#mqtt_message{ id = MessageId, retain = Retain, topic = Topic,
-    payload = Payload, qos = QoS, from = {ClientId, Username}, pktid = PacketId},
 
     Json = mochijson2:encode([
         {type, <<"message_published">>},
