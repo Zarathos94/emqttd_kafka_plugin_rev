@@ -69,7 +69,7 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
         {cluster_node, node()},
         {ts, emqttd_time:now_to_secs()}
     ]),
-    
+
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
 
     {ok, Client}.
@@ -105,7 +105,7 @@ on_client_disconnected(Reason, _Client = #mqtt_client{client_id = ClientId}, _En
 on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
     %io:format("client ~s subscribed ~p~n", [ClientId, TopicTable]),
     case TopicTable of
-        [_|_] -> 
+        [_|_] ->
             %% If TopicTable list is not empty
             Key = proplists:get_keys(TopicTable),
             %% build json to send using ClientId
@@ -118,7 +118,7 @@ on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
                 {ts, emqttd_time:now_to_secs()}
             ]),
             ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
-        _ -> 
+        _ ->
             %% If TopicTable is empty
             io:format("empty topic ~n")
     end,
@@ -131,9 +131,9 @@ on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
 %%-----------client unsubscribed start----------------------------------------%%
 
 on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
-    io:format("client ~s(~s) unsubscribe ~p~n", [ClientId, Username, TopicTable]),
+    %io:format("client ~s(~s) unsubscribe ~p~n", [ClientId, Username, TopicTable]),
     case TopicTable of
-        [_|_] -> 
+        [_|_] ->
             %% If TopicTable list is not empty
             Key = proplists:get_keys(TopicTable),
             %% build json to send using ClientId
@@ -146,11 +146,11 @@ on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
                 {ts, emqttd_time:now_to_secs()}
             ]),
             ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
-        _ -> 
+        _ ->
             %% If TopicTable is empty
             io:format("empty topic ~n")
     end,
-    
+
     {ok, TopicTable}.
 
 
@@ -161,12 +161,12 @@ on_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>}, _Env)
     {ok, Message};
 
 on_message_publish(Message, _Env) ->
-    io:format("publish ~s~n", [emqttd_message:format(Message)]),   
+    %io:format("publish ~s~n", [emqttd_message:format(Message)]),
 
     {ClientId, Username} = Message#mqtt_message.from,
     %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
-    Payload = Message#mqtt_message.payload, 
+    Payload = Message#mqtt_message.payload,
     QoS = Message#mqtt_message.qos,
     Timestamp = Message#mqtt_message.timestamp,
 
@@ -186,7 +186,7 @@ on_message_publish(Message, _Env) ->
     {ok, Message}.
 
 on_session_created(ClientId, Username, _Env) ->
-    io:format("session(~s/~s) created.", [ClientId, Username]),
+    %io:format("session(~s/~s) created.", [ClientId, Username]),
     Json = mochijson2:encode([
         {type, <<"session_created">>},
         {client_id, ClientId},
@@ -197,7 +197,7 @@ on_session_created(ClientId, Username, _Env) ->
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
 
 on_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
-    io:format("session(~s/~s) subscribed: ~p~n", [Username, ClientId, {Topic, Opts}]),
+    %io:format("session(~s/~s) subscribed: ~p~n", [Username, ClientId, {Topic, Opts}]),
     Json = mochijson2:encode([
         {type, <<"session_created">>},
         {client_id, ClientId},
@@ -210,7 +210,7 @@ on_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
     {ok, {Topic, Opts}}.
 
 on_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
-    io:format("session(~s/~s) unsubscribed: ~p~n", [Username, ClientId, {Topic, Opts}]),
+    %io:format("session(~s/~s) unsubscribed: ~p~n", [Username, ClientId, {Topic, Opts}]),
     Json = mochijson2:encode([
         {type, <<"session_unsubscribed">>},
         {client_id, ClientId},
@@ -223,7 +223,7 @@ on_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
     ok.
 
 on_session_terminated(ClientId, Username, Reason, _Env) ->
-    io:format("session(~s/~s) terminated: ~p.", [ClientId, Username, Reason]),
+    %io:format("session(~s/~s) terminated: ~p.", [ClientId, Username, Reason]),
     Json = mochijson2:encode([
         {type, <<"session_terminated">>},
         {client_id, ClientId},
@@ -237,12 +237,12 @@ on_session_terminated(ClientId, Username, Reason, _Env) ->
 
 %%-----------message delivered start--------------------------------------%%
 on_message_delivered(ClientId, Username, Message, _Env) ->
-    io:format("delivered to client ~s: ~s~n", [ClientId, emqttd_message:format(Message)]),
+    %io:format("delivered to client ~s: ~s~n", [ClientId, emqttd_message:format(Message)]),
 
     {SenderId, SenderName} = Message#mqtt_message.from,
     %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
-    Payload = Message#mqtt_message.payload, 
+    Payload = Message#mqtt_message.payload,
     QoS = Message#mqtt_message.qos,
     Timestamp = Message#mqtt_message.timestamp,
 
@@ -266,12 +266,12 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
 
 %%-----------acknowledgement publish start----------------------------%%
 on_message_acked(ClientId, Username, Message, _Env) ->
-    io:format("client ~s acked: ~s~n", [ClientId, emqttd_message:format(Message)]),   
+    %io:format("client ~s acked: ~s~n", [ClientId, emqttd_message:format(Message)]),
 
     {SenderId, SenderName} = Message#mqtt_message.from,
     %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
-    Payload = Message#mqtt_message.payload, 
+    Payload = Message#mqtt_message.payload,
     QoS = Message#mqtt_message.qos,
     Timestamp = Message#mqtt_message.timestamp,
 
@@ -312,7 +312,7 @@ ekaf_init(_Env) ->
     {ok, _} = application:ensure_all_started(ranch),
     {ok, _} = application:ensure_all_started(ekaf),
 
-    io:format("Init ekaf with ~p~n", [BootstrapBroker]).
+    io:format("Initialized ekaf with ~p~n | for topic 'broker_message'", [BootstrapBroker]).
 
 
 %% Called when the plugin application stop
@@ -328,4 +328,3 @@ unload() ->
     emqttd:unhook('message.publish', fun ?MODULE:on_message_publish/2),
     emqttd:unhook('message.delivered', fun ?MODULE:on_message_delivered/4),
     emqttd:unhook('message.acked', fun ?MODULE:on_message_acked/4).
-
