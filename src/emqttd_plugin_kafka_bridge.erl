@@ -159,15 +159,8 @@ on_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>}, _Env)
 on_message_publish(Message, _Env) ->
     io:format("publish ~s~n", [emqttd_message:format(Message)]),
 
-    {ClientId, Username} = Message#mqtt_message.from,
-    %Sender =  Message#mqtt_message.sender,
-    MessageId = Message#mqtt_message.id,
-    Retain = Message#mqtt_message.retain,
-    Topic = Message#mqtt_message.topic,
-    Payload = Message#mqtt_message.payload,
-    PacketId = Message#mqtt_message.pktid,
-    QoS = Message#mqtt_message.qos,
-    Timestamp = Message#mqtt_message.timestamp,
+    Message#mqtt_message{ id = MessageId, retain = Retain, topic = Topic,
+    payload = Payload, qos = QoS, from = {ClientId, Username}, pktid = PacketId},
 
     Json = mochijson2:encode([
         {type, <<"message_published">>},
@@ -175,12 +168,11 @@ on_message_publish(Message, _Env) ->
         {username, Username},
         {topic, Topic},
         {payload, Payload},
-        {qos, QoS},
+        {qos, i(QoS)},
         {message_id, MessageId},
         {packet_id, PacketId},
-        {retain, Retain},
-        {cluster_node, node()},
-        {ts, Timestamp}
+        {retain, i(Retain)},
+        {cluster_node, node()}
     ]),
     io:format("JSON ~s~n", [list_to_binary(Json)]),
 
