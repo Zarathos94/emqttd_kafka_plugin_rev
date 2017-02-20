@@ -66,8 +66,7 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
     Json = mochijson2:encode([
         {type, <<"connected">>},
         {client_id, ClientId},
-        {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
+        {cluster_node, node()}
     ]),
 
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -87,8 +86,7 @@ on_client_disconnected(Reason, _Client = #mqtt_client{client_id = ClientId}, _En
         {type, <<"disconnected">>},
         {client_id, ClientId},
         {reason, Reason},
-        {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
+        {cluster_node, node()}
     ]),
 
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -114,8 +112,7 @@ on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
                 {client_id, ClientId},
                 {username, Username},
                 {topic, lists:last(Key)},
-                {cluster_node, node()},
-                {ts, emqttd_time:now_to_secs()}
+                {cluster_node, node()}
             ]),
             ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
         _ ->
@@ -142,8 +139,7 @@ on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
                 {client_id, ClientId},
                 {username, Username},
                 {topic, lists:last(Key)},
-                {cluster_node, node()},
-                {ts, emqttd_time:now_to_secs()}
+                {cluster_node, node()}
             ]),
             ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
         _ ->
@@ -178,7 +174,7 @@ on_message_publish(Message, _Env) ->
         {payload, Payload},
         {qos, QoS},
         {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
+        {ts, Timestamp}
     ]),
 
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -191,8 +187,7 @@ on_session_created(ClientId, Username, _Env) ->
         {type, <<"session_created">>},
         {client_id, ClientId},
         {username, Username},
-        {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
+        {cluster_node, node()}
     ]),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
 
@@ -203,8 +198,7 @@ on_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
         {client_id, ClientId},
         {username, Username},
         {topic, Topic},
-        {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
+        {cluster_node, node()}
     ]),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     {ok, {Topic, Opts}}.
@@ -216,8 +210,7 @@ on_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
         {client_id, ClientId},
         {username, Username},
         {topic, Topic},
-        {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
+        {cluster_node, node()}
     ]),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     ok.
@@ -229,8 +222,7 @@ on_session_terminated(ClientId, Username, Reason, _Env) ->
         {client_id, ClientId},
         {username, Username},
         {reason, Reason},
-        {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
+        {cluster_node, node()}
     ]),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
 
@@ -256,7 +248,7 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
         {payload, Payload},
         {qos, QoS},
         {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
+        {ts, Timestamp}
     ]),
 
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -285,7 +277,7 @@ on_message_acked(ClientId, Username, Message, _Env) ->
         {payload, Payload},
         {qos, QoS},
         {cluster_node, node()},
-        {ts, emqttd_time:now_to_secs()}
+        {ts, Timestamp}
     ]),
 
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
