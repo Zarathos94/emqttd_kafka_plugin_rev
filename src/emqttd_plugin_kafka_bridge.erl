@@ -156,11 +156,19 @@ on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
 on_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>}, _Env) ->
     {ok, Message};
 
-on_message_publish(Message#mqtt_message{ id = MessageId, retain = Retain, topic = Topic,
-payload = Payload, qos = QoS, from = {ClientId, Username}, pktid = PacketId}, _Env) ->
-    io:format("publish ~s~n", [emqttd_message:format(Message)]),
+on_message_publish(Message, _Env) ->
 
 
+    {ClientId, Username} = Message#mqtt_message.from,
+    %Sender =  Message#mqtt_message.sender,
+    MessageId = Message#mqtt_message.id,
+    Retain = Message#mqtt_message.retain,
+    Topic = Message#mqtt_message.topic,
+    Payload = Message#mqtt_message.payload,
+    PacketId = Message#mqtt_message.pktid,
+    QoS = Message#mqtt_message.qos,
+    Timestamp = Message#mqtt_message.timestamp,
+    io:format("publish ~p | ~p | ~p | ~p | ~p | ~p | ~p | ~p | ~p ~n", [ClientId, Username, Topic, Payload, i(QoS), MessageId, PacketId, i(Retain), Timestamp]),
     Json = mochijson2:encode([
         {type, <<"message_published">>},
         {client_id, ClientId},
@@ -171,7 +179,8 @@ payload = Payload, qos = QoS, from = {ClientId, Username}, pktid = PacketId}, _E
         {message_id, MessageId},
         {packet_id, PacketId},
         {retain, i(Retain)},
-        {cluster_node, node()}
+        {cluster_node, node()},
+        {ts, Timestamp}
     ]),
     io:format("JSON ~s~n", [list_to_binary(Json)]),
 
