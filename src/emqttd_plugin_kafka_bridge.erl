@@ -167,7 +167,7 @@ on_message_publish(Message, _Env) ->
     Timestamp = Message#mqtt_message.timestamp,
 
     Json = mochijson2:encode([
-        {type, <<"published">>},
+        {type, <<"message_published">>},
         {client_id, ClientId},
         {username, Username},
         {topic, Topic},
@@ -239,7 +239,7 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
     Timestamp = Message#mqtt_message.timestamp,
 
     Json = mochijson2:encode([
-        {type, <<"delivered">>},
+        {type, <<"message_delivered">>},
         {client_id, ClientId},
         {sender_id, SenderId},
         {sender_name, SenderName},
@@ -268,7 +268,7 @@ on_message_acked(ClientId, Username, Message, _Env) ->
     Timestamp = Message#mqtt_message.timestamp,
 
     Json = mochijson2:encode([
-        {type, <<"acked">>},
+        {type, <<"message_acked">>},
         {client_id, ClientId},
         {username, Username},
         {sender_id, SenderId},
@@ -304,7 +304,7 @@ ekaf_init(_Env) ->
     {ok, _} = application:ensure_all_started(ranch),
     {ok, _} = application:ensure_all_started(ekaf),
 
-    io:format("Initialized ekaf with ~p~n | for topic 'broker_message'", [BootstrapBroker]).
+    io:format("Initialized ekaf with ~p~n", [BootstrapBroker]).
 
 
 %% Called when the plugin application stop
