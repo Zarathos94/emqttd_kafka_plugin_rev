@@ -157,12 +157,15 @@ on_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>}, _Env)
     {ok, Message};
 
 on_message_publish(Message, _Env) ->
-    %io:format("publish ~s~n", [emqttd_message:format(Message)]),
+    io:format("publish ~s~n", [emqttd_message:format(Message)]),
 
     {ClientId, Username} = Message#mqtt_message.from,
     %Sender =  Message#mqtt_message.sender,
+    MessageId = Message#mqtt_message.id,
+    Retain = Message#mqtt_message.retain,
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload,
+    PacketId = Message#mqtt_message.pktid,
     QoS = Message#mqtt_message.qos,
     Timestamp = Message#mqtt_message.timestamp,
 
@@ -173,9 +176,13 @@ on_message_publish(Message, _Env) ->
         {topic, Topic},
         {payload, Payload},
         {qos, QoS},
+        {message_id, MessageId},
+        {packet_id, PacketId},
+        {retain, Retain},
         {cluster_node, node()},
         {ts, Timestamp}
     ]),
+    io:format("JSON ~s~n", [list_to_binary(Json)]),
 
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
 
