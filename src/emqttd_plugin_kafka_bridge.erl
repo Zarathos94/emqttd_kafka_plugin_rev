@@ -171,8 +171,7 @@ on_message_publish(Message, _Env) ->
     Payload = Message#mqtt_message.payload,
     PacketId = Message#mqtt_message.pktid,
     QoS = Message#mqtt_message.qos,
-    Timestamp = Message#mqtt_message.timestamp,
-    io:format("publish ~p | ~p | ~p | ~p | ~p | ~p | ~p | ~p | ~p ~n", [ClientId, Username, Topic, Payload, QoS, MessageId, PacketId, Retain, Timestamp]),
+    io:format("publish ~p | ~p | ~p | ~p | ~p | ~p | ~p | ~p ~n", [ClientId, Username, Topic, Payload, QoS, MessageId, PacketId, Retain]),
     Json = mochijson2:encode([
         {type, <<"message_published">>},
         {client_id, ClientId},
@@ -187,8 +186,7 @@ on_message_publish(Message, _Env) ->
         {message_id, MessageId},
         {packet_id, PacketId},
         {retain, Retain},
-        {cluster_node, node()},
-        {ts, Timestamp}
+        {cluster_node, node()}
     ]),
     io:format("JSON ~s~n", [list_to_binary(Json)]),
 
