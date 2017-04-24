@@ -161,7 +161,7 @@ on_message_publish(Message, _Env) ->
 
     {ClientId, Username} = Message#mqtt_message.from,
     %Sender =  Message#mqtt_message.sender,
-    MessageId = Message#mqtt_message.id,
+    %MessageId = Message#mqtt_message.id,
     %Retain = Message#mqtt_message.retain,
     Topic = Message#mqtt_message.topic,
     %Flags = Message#mqtt_message.flags,
@@ -171,7 +171,7 @@ on_message_publish(Message, _Env) ->
     Payload = Message#mqtt_message.payload,
     %PacketId = Message#mqtt_message.pktid,
     QoS = Message#mqtt_message.qos,
-    io:format("publish ~p | ~p | ~p | ~p | ~p | ~p ~n", [ClientId, Username, Topic, Payload, QoS, MessageId]),
+    io:format("publish ~p | ~p | ~p | ~p | ~p | ~p ~n", [ClientId, Username, Topic, Payload, QoS]),
     Json = mochijson2:encode([
         {type, <<"message_published">>},
         {client_id, ClientId},
@@ -183,7 +183,7 @@ on_message_publish(Message, _Env) ->
         %{sys, Sys},
         %{dup, Dup},
         %{flags, Flags},
-        {message_id, MessageId},
+        %{message_id, MessageId},
         %{packet_id, PacketId},
         %{retain, Retain},
         {cluster_node, node()}
