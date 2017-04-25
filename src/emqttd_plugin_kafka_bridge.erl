@@ -32,6 +32,8 @@
 
 -include("../../emqttd/include/emqttd_internal.hrl").
 
+-include("../../rmq/include/amqp_client.hrl").
+
 -export([load/1, unload/0]).
 
 %% Hooks functions
