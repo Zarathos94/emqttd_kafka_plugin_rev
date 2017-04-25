@@ -197,7 +197,7 @@ on_message_publish(Message, _Env) ->
     Payload = Message#mqtt_message.payload,
     %PacketId = Message#mqtt_message.pktid,
     %QoS = Message#mqtt_message.qos,
-    io:format("publish ~p ~n", [list_to_binary(integer_to_list(MessageId, 16))]),
+    io:format("publish ~p ~n", [MessageId]),
     Json = mochijson2:encode([
         {type, <<"message_published">>},
         {client_id, ClientId},
