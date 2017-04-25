@@ -45,6 +45,7 @@
 
 -export([on_message_publish/2, on_message_delivered/4, on_message_acked/4]).
 
+-export([uuid_to_string/1]).
 %% Called when the plugin application start
 load(Env) ->
     %ekaf_init([Env]),
@@ -61,6 +62,10 @@ load(Env) ->
     emqttd:hook('message.delivered', fun ?MODULE:on_message_delivered/4, [Env]),
     emqttd:hook('message.acked', fun ?MODULE:on_message_acked/4, [Env]).
 
+
+
+uuid_to_string(<<I:128>>) ->
+  integer_to_list(I, 16).
 %%-----------client connect start-----------------------------------%%
 
 on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env) ->
@@ -192,14 +197,14 @@ on_message_publish(Message, _Env) ->
     Payload = Message#mqtt_message.payload,
     %PacketId = Message#mqtt_message.pktid,
     %QoS = Message#mqtt_message.qos,
-    %io:format("publish ~p | ~p | ~p | ~p ~n", [ClientId, Username, Topic, Payload]),
+    io:format("publish ~p ~n", [uuid_to_string(MessageId)]),
     Json = mochijson2:encode([
         {type, <<"message_published">>},
         {client_id, ClientId},
         {username, Username},
         {topic, Topic},
         {payload, Payload},
-        {message_id, list_to_binary(MessageId)},
+        {message_id, emqttd_guid:to_hexstr(MessageId)},
         %{qos, QoS},
         %{headers,Headers},
         %{sys, Sys},
@@ -341,8 +346,7 @@ on_message_acked(ClientId, Username, Message, _Env) ->
         {topic, Topic},
         {payload, Payload},
         %{qos, QoS},
-        {cluster_node, node()},
-        {timestamp, erlang:system_time(micro_seconds)}
+        {cluster_node, node()}
         %{ts, Timestamp}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
