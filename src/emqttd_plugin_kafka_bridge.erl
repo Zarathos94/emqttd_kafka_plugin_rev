@@ -47,7 +47,7 @@
 
 %% Called when the plugin application start
 load(Env) ->
-    ekaf_init([Env]),
+    %ekaf_init([Env]),
     rmq_init([Env]),
     emqttd:hook('client.connected', fun ?MODULE:on_client_connected/3, [Env]),
     emqttd:hook('client.disconnected', fun ?MODULE:on_client_disconnected/3, [Env]),
@@ -74,8 +74,8 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_connected">>},
-    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
-    ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
+    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}).
+    %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
 
     {ok, Client}.
 
@@ -97,8 +97,8 @@ on_client_disconnected(Reason, _Client = #mqtt_client{client_id = ClientId}, _En
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_disconnected">>},
-    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
-    ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
+    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}).
+    %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
 
     ok.
 
@@ -126,8 +126,8 @@ on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
             {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
             %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
             Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_subscriptions">>},
-            amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
-            ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
+            amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)});
+            %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
         _ ->
             %% If TopicTable is empty
             io:format("empty topic ~n")
@@ -157,8 +157,8 @@ on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
             {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
             %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
             Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_unsubscriptions">>},
-            amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
-            ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
+            amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)});
+            %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
         _ ->
             %% If TopicTable is empty
             io:format("empty topic ~n")
@@ -211,7 +211,7 @@ on_message_publish(Message, _Env) ->
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_publish">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
 
-    ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
+    %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
 
     {ok, Message}.
 
@@ -226,8 +226,8 @@ on_session_created(ClientId, Username, _Env) ->
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_created">>},
-    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
-    ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
+    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}).
+    %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
 
 on_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
     %io:format("session(~s/~s) subscribed: ~p~n", [Username, ClientId, {Topic, Opts}]),
@@ -241,8 +241,8 @@ on_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_subscribtions">>},
-    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
-    ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
+    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}).
+    %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     {ok, {Topic, Opts}}.
 
 on_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
@@ -258,7 +258,7 @@ on_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_unsubscriptions">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
-    ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
+    %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     ok.
 
 on_session_terminated(ClientId, Username, Reason, _Env) ->
@@ -273,8 +273,8 @@ on_session_terminated(ClientId, Username, Reason, _Env) ->
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_termination">>},
-    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
-    ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
+    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}).
+    %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
 
 
 %%-----------message delivered start--------------------------------------%%
@@ -306,7 +306,7 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_delivery_report">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
-    ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
+    %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
 
     {ok, Message}.
 %%-----------message delivered end----------------------------------------%%
@@ -338,7 +338,7 @@ on_message_acked(ClientId, Username, Message, _Env) ->
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_ack_report">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
-    ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
+    %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     {ok, Message}.
 
 %% ===================================================================
@@ -378,7 +378,7 @@ rmq_init(_Env) ->
 
   BindingDisconnected = #'queue.bind'{queue       = <<"disconnected">>,
                                 exchange    = <<"emqttd">>,
-                                routing_key = <<"emqttd_disconnected">>}
+                                routing_key = <<"emqttd_disconnected">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingDisconnected),
 
 
@@ -388,7 +388,7 @@ rmq_init(_Env) ->
 
   BindingPublish = #'queue.bind'{queue       = <<"publish">>,
                                 exchange    = <<"emqttd">>,
-                                routing_key = <<"emqttd_publish">>}
+                                routing_key = <<"emqttd_publish">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingPublish),
 
 
@@ -397,7 +397,7 @@ rmq_init(_Env) ->
 
   BindingSessionCreated = #'queue.bind'{queue       = <<"session_created">>,
                                 exchange    = <<"emqttd">>,
-                                routing_key = <<"emqttd_session_created">>}
+                                routing_key = <<"emqttd_session_created">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingSessionCreated),
 
 
@@ -407,7 +407,7 @@ rmq_init(_Env) ->
 
   BindingSessionSubscriptions = #'queue.bind'{queue       = <<"session_subscriptions">>,
                                 exchange    = <<"emqttd">>,
-                                routing_key = <<"emqttd_session_subscriptions">>}
+                                routing_key = <<"emqttd_session_subscriptions">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingSessionSubscriptions),
 
 
@@ -416,7 +416,7 @@ rmq_init(_Env) ->
 
   BindingSessionUnSubscriptions = #'queue.bind'{queue       = <<"session_unsubscriptions">>,
                                 exchange    = <<"emqttd">>,
-                                routing_key = <<"emqttd_session_unsubscriptions">>}
+                                routing_key = <<"emqttd_session_unsubscriptions">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingSessionUnSubscriptions),
 
 
@@ -425,7 +425,7 @@ rmq_init(_Env) ->
 
   BindingSessionTermination = #'queue.bind'{queue       = <<"session_termination">>,
                                 exchange    = <<"emqttd">>,
-                                routing_key = <<"emqttd_session_termination">>}
+                                routing_key = <<"emqttd_session_termination">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingSessionTermination),
 
   DeclareQueueDeliveryReport = #'queue.declare'{queue = <<"delivery_report">>},
@@ -433,7 +433,7 @@ rmq_init(_Env) ->
 
   BindingDeliveryReport = #'queue.bind'{queue       = <<"delivery_report">>,
                                 exchange    = <<"emqttd">>,
-                                routing_key = <<"emqttd_delivery_report">>}
+                                routing_key = <<"emqttd_delivery_report">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingDeliveryReport),
 
   DeclareQueueAckReport = #'queue.declare'{queue = <<"ack_report">>},
@@ -441,7 +441,7 @@ rmq_init(_Env) ->
 
   BindingAckReport = #'queue.bind'{queue       = <<"ack_report">>,
                                 exchange    = <<"emqttd">>,
-                                routing_key = <<"emqttd_ack_report">>}
+                                routing_key = <<"emqttd_ack_report">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingDeliveryReport),
 
   {ok, _} = application:ensure_all_started(amqp_client),
