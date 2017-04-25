@@ -310,8 +310,11 @@ rmq_init(_Env) ->
   {ok, Rmq} = application:get_env(emqttd_plugin_kafka_bridge, rmq),
   Virtualhost = proplists:get_value(virtualhost, Rmq),
   {Username, Password} = proplists:get_value(credentials, Rmq),
+  RMQPort = proplists:get_value(port, Rmq),
+  RMQHost = proplists:get_value(host, Rmq),
   {ok, Connection} = amqp_connection:start(#amqp_params_network{
-    username = Username, password = Password, virtual_host = Virtualhost
+    username = Username, password = Password, virtual_host = Virtualhost,
+    host = RMQHost, port = RMQPort
   }),
   {ok, Channel} = amqp_connection:open_channel(Connection),
   Declare = #'exchange.declare'{exchange = <<"emqttd">>},
