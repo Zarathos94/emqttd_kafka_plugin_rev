@@ -324,7 +324,7 @@ rmq_init(_Env) ->
   DeclareExchange = #'exchange.declare'{exchange = <<"emqttd">>},
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, DeclareExchange),
   DeclareQueue = #'queue.declare'{queue = <<"connected">>},
-  #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueue)
+  #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueue),
 
   Binding = #'queue.bind'{queue       = <<"connected">>,
                              exchange    = <<"emqttd">>,
