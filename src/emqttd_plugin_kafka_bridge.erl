@@ -336,7 +336,7 @@ rmq_init(_Env) ->
      #'queue.bind_ok'{} = amqp_channel:call(Channel, Binding),
 
   {ok, _} = application:ensure_all_started(amqp_client),
-  io:format("Initialized rabbitmq connection to host: ~p:~p with exchange: ~p on channel: ~n", [RMQHost, RMQPort, "emqttd", Channel]).
+  io:format("Initialized rabbitmq connection to host: ~p:~p with exchange: ~p on channel: ~p~n", [RMQHost, RMQPort, "emqttd", Channel]).
 
 %% ===================================================================
 %% ekaf_init
