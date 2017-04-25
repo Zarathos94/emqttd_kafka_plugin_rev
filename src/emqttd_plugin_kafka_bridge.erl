@@ -161,7 +161,7 @@ on_message_publish(Message, _Env) ->
 
     {ClientId, Username} = Message#mqtt_message.from,
     %Sender =  Message#mqtt_message.sender,
-    MessageId = Message#mqtt_message.id,
+    {MessageId} = Message#mqtt_message.id,
     %Retain = Message#mqtt_message.retain,
     Topic = Message#mqtt_message.topic,
     %Flags = Message#mqtt_message.flags,
@@ -248,7 +248,7 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
     {SenderId, SenderName} = Message#mqtt_message.from,
     %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
-    MessageId = Message#mqtt_message.id,
+    {MessageId} = Message#mqtt_message.id,
     Payload = Message#mqtt_message.payload,
     %QoS = Message#mqtt_message.qos,
     %Timestamp = Message#mqtt_message.timestamp,
@@ -280,8 +280,8 @@ on_message_acked(ClientId, Username, Message, _Env) ->
     %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload,
-    QoS = Message#mqtt_message.qos,
-    Timestamp = Message#mqtt_message.timestamp,
+    %QoS = Message#mqtt_message.qos,
+    %Timestamp = Message#mqtt_message.timestamp,
 
     Json = mochijson2:encode([
         {type, <<"message_acked">>},
@@ -291,9 +291,9 @@ on_message_acked(ClientId, Username, Message, _Env) ->
         {sender_name, SenderName},
         {topic, Topic},
         {payload, Payload},
-        {qos, QoS},
-        {cluster_node, node()},
-        {ts, Timestamp}
+        %{qos, QoS},
+        {cluster_node, node()}
+        %{ts, Timestamp}
     ]),
 
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
