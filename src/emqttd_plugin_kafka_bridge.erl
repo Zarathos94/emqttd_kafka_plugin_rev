@@ -197,7 +197,7 @@ on_message_publish(Message, _Env) ->
     Payload = Message#mqtt_message.payload,
     %PacketId = Message#mqtt_message.pktid,
     %QoS = Message#mqtt_message.qos,
-    io:format("publish ~p ~n", [MessageId/binary]),
+    io:format("publish ~p ~n", [integer_to_list(MessageId, 8)]),
     Json = mochijson2:encode([
         {type, <<"message_published">>},
         {client_id, ClientId},
@@ -214,7 +214,6 @@ on_message_publish(Message, _Env) ->
         %{packet_id, PacketId},
         %{retain, Retain},
         {cluster_node, node()},
-
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
