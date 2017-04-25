@@ -74,7 +74,7 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_connected">>},
-    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}).
+    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
 
     {ok, Client}.
@@ -97,7 +97,7 @@ on_client_disconnected(Reason, _Client = #mqtt_client{client_id = ClientId}, _En
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_disconnected">>},
-    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}).
+    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
 
     ok.
@@ -241,7 +241,7 @@ on_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_subscribtions">>},
-    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}).
+    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     {ok, {Topic, Opts}}.
 
