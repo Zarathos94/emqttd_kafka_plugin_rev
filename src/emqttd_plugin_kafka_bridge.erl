@@ -260,7 +260,7 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
         {topic, Topic},
         {payload, Payload},
         %{qos, QoS},
-        {cluster_node, node()},
+        {cluster_node, node()}
         %{ts, Timestamp}
     ]),
 
