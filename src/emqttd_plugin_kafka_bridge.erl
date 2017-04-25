@@ -32,7 +32,7 @@
 
 -include("../../emqttd/include/emqttd_internal.hrl").
 
--include("../../rmq/include/amqp_client.hrl").
+-include("../../amqp_client/include/amqp_client.hrl").
 
 -export([load/1, unload/0]).
 
