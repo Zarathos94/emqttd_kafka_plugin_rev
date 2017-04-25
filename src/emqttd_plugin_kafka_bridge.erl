@@ -72,9 +72,9 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
         {cluster_node, node()}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
-    io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
+    %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_connected">>},
-    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = Json}),
+    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
 
     {ok, Client}.
