@@ -69,7 +69,8 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
     Json = mochijson2:encode([
         {type, <<"connected">>},
         {client_id, ClientId},
-        {cluster_node, node()}
+        {cluster_node, node()},
+        {timestamp, calendar:now_to_local_time(erlang:now())}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
