@@ -65,7 +65,7 @@ load(Env) ->
 
 
 uuid_to_string(<<I:128>>) ->
-  integer_to_list(I, 16).
+  integer_to_list(I, 32).
 %%-----------client connect start-----------------------------------%%
 
 on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env) ->
@@ -197,7 +197,7 @@ on_message_publish(Message, _Env) ->
     Payload = Message#mqtt_message.payload,
     %PacketId = Message#mqtt_message.pktid,
     %QoS = Message#mqtt_message.qos,
-    io:format("publish ~p ~n", [uuid_to_string(MessageId)]),
+    io:format("publish ~p ~n", [MessageId]),
     Json = mochijson2:encode([
         {type, <<"message_published">>},
         {client_id, ClientId},
