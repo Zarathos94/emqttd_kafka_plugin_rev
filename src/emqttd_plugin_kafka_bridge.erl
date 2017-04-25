@@ -307,7 +307,7 @@ on_message_acked(ClientId, Username, Message, _Env) ->
 %% ===================================================================
 
 rmq_init(_Env) ->
-  {ok, Rmq} = application:get_env(emqttd_plugin_kafka_bridge, rabbitmq),
+  {ok, Rmq} = application:get_env(emqttd_plugin_kafka_bridge, amqp_client),
   Virtualhost = proplists:get_value(virtualhost, Rmq),
   {Username, Password} = proplists:get_value(credentials, Rmq),
   RMQPort = proplists:get_value(port, Rmq),
