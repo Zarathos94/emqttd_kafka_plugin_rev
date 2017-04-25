@@ -71,7 +71,8 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
         {client_id, ClientId},
         {cluster_node, node()}
     ]),
-
+    Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_connected">>},
+    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = Json}),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
 
     {ok, Client}.
@@ -332,7 +333,7 @@ rmq_init(_Env) ->
      #'queue.bind_ok'{} = amqp_channel:call(Channel, Binding),
 
   {ok, _} = application:ensure_all_started(amqp_client),
-  io:format("Initialized rabbitmq connection to host: ~p:~p with exchange: ~p~n", [RMQHost, RMQPort, <<"emqttd">>]).
+  io:format("Initialized rabbitmq connection to host: ~p:~p with exchange: ~p~n", [RMQHost, RMQPort, "emqttd"]).
 
 %% ===================================================================
 %% ekaf_init
