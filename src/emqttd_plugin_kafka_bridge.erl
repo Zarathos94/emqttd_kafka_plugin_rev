@@ -71,6 +71,7 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
         {client_id, ClientId},
         {cluster_node, node()}
     ]),
+    {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_connected">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = Json}),
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -322,6 +323,7 @@ rmq_init(_Env) ->
     client_properties = [], socket_options = []
   }),
   {ok, Channel} = amqp_connection:open_channel(Connection),
+  application:set_env(emqttd_plugin_kafka_bridge, rmq_channel, Channel),
   DeclareExchange = #'exchange.declare'{exchange = <<"emqttd">>},
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, DeclareExchange),
   DeclareQueue = #'queue.declare'{queue = <<"connected">>},
@@ -348,6 +350,7 @@ ekaf_init(_Env) ->
     application:set_env(ekaf, ekaf_partition_strategy, PartitionStrategy),
     %% Set broker url and port, like application:set_env(ekaf, ekaf_bootstrap_broker, {"127.0.0.1", 9092}),
     application:set_env(ekaf, ekaf_bootstrap_broker, BootstrapBroker),
+
     %% Set topic
     application:set_env(ekaf, ekaf_bootstrap_topics, <<"broker_message">>),
 
