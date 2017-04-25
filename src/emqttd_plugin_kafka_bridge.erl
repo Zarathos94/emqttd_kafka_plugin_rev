@@ -161,7 +161,7 @@ on_message_publish(Message, _Env) ->
 
     {ClientId, Username} = Message#mqtt_message.from,
     %Sender =  Message#mqtt_message.sender,
-    {MessageId} = Message#mqtt_message.id,
+    MessageId = Message#mqtt_message.id,
     %Retain = Message#mqtt_message.retain,
     Topic = Message#mqtt_message.topic,
     %Flags = Message#mqtt_message.flags,
@@ -178,7 +178,7 @@ on_message_publish(Message, _Env) ->
         {username, Username},
         {topic, Topic},
         {payload, Payload},
-        {message_id, MessageId},
+        {message_id, emqttd_guid:to_hexstr(MessageId)},
         %{qos, QoS},
         %{headers,Headers},
         %{sys, Sys},
@@ -248,7 +248,7 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
     {SenderId, SenderName} = Message#mqtt_message.from,
     %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
-    {MessageId} = Message#mqtt_message.id,
+    MessageId = Message#mqtt_message.id,
     Payload = Message#mqtt_message.payload,
     %QoS = Message#mqtt_message.qos,
     %Timestamp = Message#mqtt_message.timestamp,
@@ -261,7 +261,7 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
         {username, Username},
         {topic, Topic},
         {payload, Payload},
-        {message_id, MessageId},
+        {message_id, emqttd_guid:to_hexstr(MessageId)},
         %{qos, QoS},
         {cluster_node, node()}
         %{ts, Timestamp}
