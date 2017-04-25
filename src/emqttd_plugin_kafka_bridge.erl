@@ -93,7 +93,8 @@ on_client_disconnected(Reason, _Client = #mqtt_client{client_id = ClientId}, _En
         {type, <<"disconnected">>},
         {client_id, ClientId},
         {reason, Reason},
-        {cluster_node, node()}
+        {cluster_node, node()},
+        {timestamp, erlang:system_time(micro_seconds)}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
@@ -122,7 +123,8 @@ on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
                 {client_id, ClientId},
                 {username, Username},
                 {topic, lists:last(Key)},
-                {cluster_node, node()}
+                {cluster_node, node()},
+                {timestamp, erlang:system_time(micro_seconds)}
             ]),
             {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
             %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
@@ -153,7 +155,8 @@ on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
                 {client_id, ClientId},
                 {username, Username},
                 {topic, lists:last(Key)},
-                {cluster_node, node()}
+                {cluster_node, node()},
+                {timestamp, erlang:system_time(micro_seconds)}
             ]),
             {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
             %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
@@ -196,7 +199,7 @@ on_message_publish(Message, _Env) ->
         {username, Username},
         {topic, Topic},
         {payload, Payload},
-        {message_id, emqttd_guid:to_hexstr(MessageId)},
+        {message_id, list_to_binary(MessageId)},
         %{qos, QoS},
         %{headers,Headers},
         %{sys, Sys},
@@ -205,7 +208,8 @@ on_message_publish(Message, _Env) ->
         %{message_id, MessageId},
         %{packet_id, PacketId},
         %{retain, Retain},
-        {cluster_node, node()}
+        {cluster_node, node()},
+        {timestamp, erlang:system_time(micro_seconds)}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
@@ -222,7 +226,8 @@ on_session_created(ClientId, Username, _Env) ->
         {type, <<"session_created">>},
         {client_id, ClientId},
         {username, Username},
-        {cluster_node, node()}
+        {cluster_node, node()},
+        {timestamp, erlang:system_time(micro_seconds)}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
@@ -237,7 +242,8 @@ on_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
         {client_id, ClientId},
         {username, Username},
         {topic, Topic},
-        {cluster_node, node()}
+        {cluster_node, node()},
+        {timestamp, erlang:system_time(micro_seconds)}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
@@ -253,7 +259,8 @@ on_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
         {client_id, ClientId},
         {username, Username},
         {topic, Topic},
-        {cluster_node, node()}
+        {cluster_node, node()},
+        {timestamp, erlang:system_time(micro_seconds)}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
@@ -269,7 +276,8 @@ on_session_terminated(ClientId, Username, Reason, _Env) ->
         {client_id, ClientId},
         {username, Username},
         {reason, Reason},
-        {cluster_node, node()}
+        {cluster_node, node()},
+        {timestamp, erlang:system_time(micro_seconds)}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
@@ -300,7 +308,8 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
         {payload, Payload},
         {message_id, emqttd_guid:to_hexstr(MessageId)},
         %{qos, QoS},
-        {cluster_node, node()}
+        {cluster_node, node()},
+        {timestamp, erlang:system_time(micro_seconds)}
         %{ts, Timestamp}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
@@ -332,7 +341,8 @@ on_message_acked(ClientId, Username, Message, _Env) ->
         {topic, Topic},
         {payload, Payload},
         %{qos, QoS},
-        {cluster_node, node()}
+        {cluster_node, node()},
+        {timestamp, erlang:system_time(micro_seconds)}
         %{ts, Timestamp}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
