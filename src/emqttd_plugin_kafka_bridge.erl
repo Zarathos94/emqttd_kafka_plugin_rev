@@ -312,7 +312,11 @@ rmq_init(_Env) ->
   {Username, Password} = proplists:get_value(credentials, Rmq),
   RMQPort = proplists:get_value(port, Rmq),
   RMQHost = proplists:get_value(host, Rmq),
-  {ok, Connection} = amqp_connection:start(#amqp_params_network{}),
+  {ok, Connection} = amqp_connection:start(#amqp_params_network{
+    username = Username, password = Password, virtual_host = Virtualhost,
+    host = RMQHost, port = RMQPort, auth_mechanisms =	[fun amqp_auth_mechanisms:plain/3, fun amqp_auth_mechanisms:amqplain/3],
+    heartbeat = 20
+  }),
   {ok, Channel} = amqp_connection:open_channel(Connection),
   Declare = #'exchange.declare'{exchange = <<"emqttd">>},
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, Declare).
