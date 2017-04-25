@@ -46,6 +46,7 @@
 %% Called when the plugin application start
 load(Env) ->
     ekaf_init([Env]),
+    rmq_init([Env]),
     emqttd:hook('client.connected', fun ?MODULE:on_client_connected/3, [Env]),
     emqttd:hook('client.disconnected', fun ?MODULE:on_client_disconnected/3, [Env]),
     emqttd:hook('client.subscribe', fun ?MODULE:on_client_subscribe/4, [Env]),
@@ -298,6 +299,21 @@ on_message_acked(ClientId, Username, Message, _Env) ->
 
     ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     {ok, Message}.
+
+%% ===================================================================
+%% rmq_init
+%% ===================================================================
+
+rmq_init(_Env) ->
+  {ok, Rmq} = application:get_env(emqttd_plugin_kafka_bridge, rmq),
+  Virtualhost = proplists:get_value(virtualhost, Rmq),
+  {Username, Password} = proplists:get_value(credentials, Rmq),
+  {ok, Connection} = amqp_connection:start(#amqp_params_network{
+    username = Username, password = Password, virtual_host = Virtualhost
+  }),
+  {ok, Channel} = amqp_connection:open_channel(Connection),
+  Declare = #'exchange.declare'{exchange = <<"emqttd">>},
+  #'exchange.declare_ok'{} = amqp_channel:call(Channel, Declare).
 
 %% ===================================================================
 %% ekaf_init
