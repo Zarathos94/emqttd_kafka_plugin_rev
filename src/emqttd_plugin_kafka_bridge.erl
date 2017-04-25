@@ -321,8 +321,18 @@ rmq_init(_Env) ->
     client_properties = [], socket_options = []
   }),
   {ok, Channel} = amqp_connection:open_channel(Connection),
-  Declare = #'exchange.declare'{exchange = <<"emqttd">>},
-  #'exchange.declare_ok'{} = amqp_channel:call(Channel, Declare).
+  DeclareExchange = #'exchange.declare'{exchange = <<"emqttd">>},
+  #'exchange.declare_ok'{} = amqp_channel:call(Channel, DeclareExchange),
+  DeclareQueue = #'queue.declare'{queue = <<"connected">>},
+  #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueue)
+
+  Binding = #'queue.bind'{queue       = <<"connected">>,
+                             exchange    = <<"emqttd">>,
+                             routing_key = <<"emqttd_connected">>},
+     #'queue.bind_ok'{} = amqp_channel:call(Channel, Binding),
+
+  {ok, _} = application:ensure_all_started(amqp_client),
+  io:format("Initialized rabbitmq connection to host: ~p:~p with exchange: ~p~n", [RMQHost, RMQPort, <<"emqttd">>]).
 
 %% ===================================================================
 %% ekaf_init
