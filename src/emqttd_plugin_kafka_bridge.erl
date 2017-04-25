@@ -70,7 +70,7 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
         {type, <<"connected">>},
         {client_id, ClientId},
         {cluster_node, node()},
-        {timestamp, calendar:now_to_local_time(erlang:now())}
+        {timestamp, erlang:system_time(micro_seconds)}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
@@ -189,7 +189,7 @@ on_message_publish(Message, _Env) ->
     Payload = Message#mqtt_message.payload,
     %PacketId = Message#mqtt_message.pktid,
     %QoS = Message#mqtt_message.qos,
-    io:format("publish ~p | ~p | ~p | ~p ~n", [ClientId, Username, Topic, Payload]),
+    %io:format("publish ~p | ~p | ~p | ~p ~n", [ClientId, Username, Topic, Payload]),
     Json = mochijson2:encode([
         {type, <<"message_published">>},
         {client_id, ClientId},
