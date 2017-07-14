@@ -383,15 +383,7 @@ rmq_init(_Env) ->
   }),
   {ok, Channel} = amqp_connection:open_channel(Connection),
   application:set_env(emqttd_plugin_kafka_bridge, rmq_channel, Channel),
-  DeclareExchange = #'exchange.declare'{exchange = <<"emqttd">>, ticket      = 0,
-                          type        = <<"direct">>,
-                          passive     = false,
-                          durable     = true,
-                          auto_delete = false,
-                          internal    = false,
-                          nowait      = false,
-                          arguments   = []
-    },
+  DeclareExchange = #'exchange.declare'{exchange = <<"emqttd">>},
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, DeclareExchange),
 
   %% ============================== Queue bindings and declarations ========================
