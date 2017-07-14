@@ -259,7 +259,7 @@ on_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
     %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
-    Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_subscribtions">>},
+    Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_subscriptions">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     {ok, {Topic, Opts}}.
