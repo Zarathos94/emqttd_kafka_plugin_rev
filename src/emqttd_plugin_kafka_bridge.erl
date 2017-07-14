@@ -377,7 +377,7 @@ rmq_init(_Env) ->
   {ok, Connection} = amqp_connection:start(#amqp_params_network{
     username = Username, password = Password, virtual_host = Virtualhost,
     host = RMQHost, port = RMQPort,
-    frame_max = 0, heartbeat = 0, connection_timeout = infinity,
+    frame_max = 0, heartbeat = 10, connection_timeout = infinity,
     ssl_options = none, auth_mechanisms = [fun amqp_auth_mechanisms:plain/3, fun amqp_auth_mechanisms:amqplain/3],
     client_properties = [], socket_options = []
   }),
