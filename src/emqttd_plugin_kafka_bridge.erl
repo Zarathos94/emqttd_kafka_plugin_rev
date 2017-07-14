@@ -66,6 +66,12 @@ load(Env) ->
 
 uuid_to_string(<<I:128>>) ->
   integer_to_list(I, 32).
+
+%% ---------- Cluster support -------------------------------------%%
+
+
+
+
 %%-----------client connect start-----------------------------------%%
 
 on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env) ->
@@ -381,7 +387,15 @@ rmq_init(_Env) ->
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, DeclareExchange),
 
   %% ============================== Queue bindings and declarations ========================
-  DeclareQueueConnected = #'queue.declare'{queue = <<"connected">>},
+  DeclareQueueConnected = #'queue.declare'{queue = <<"connected">>, ticket      = 0,
+                          type        = <<"direct">>,
+                          passive     = false,
+                          durable     = true,
+                          auto_delete = false,
+                          internal    = false,
+                          nowait      = false,
+                          arguments   = []}
+    },
   #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueConnected),
   BindingConnected = #'queue.bind'{queue       = <<"connected">>,
                              exchange    = <<"emqttd">>,
@@ -389,7 +403,15 @@ rmq_init(_Env) ->
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingConnected),
 
 
-  DeclareQueueDisconnected = #'queue.declare'{queue = <<"disconnected">>},
+  DeclareQueueDisconnected = #'queue.declare'{queue = <<"disconnected">>,ticket      = 0,
+                          type        = <<"direct">>,
+                          passive     = false,
+                          durable     = true,
+                          auto_delete = false,
+                          internal    = false,
+                          nowait      = false,
+                          arguments   = []}
+    },
   #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueDisconnected),
 
   BindingDisconnected = #'queue.bind'{queue       = <<"disconnected">>,
@@ -399,7 +421,15 @@ rmq_init(_Env) ->
 
 
 
-  DeclareQueuePublish = #'queue.declare'{queue = <<"publish">>},
+  DeclareQueuePublish = #'queue.declare'{queue = <<"publish">>,ticket      = 0,
+                          type        = <<"direct">>,
+                          passive     = false,
+                          durable     = true,
+                          auto_delete = false,
+                          internal    = false,
+                          nowait      = false,
+                          arguments   = []}
+    },
   #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueuePublish),
 
   BindingPublish = #'queue.bind'{queue       = <<"publish">>,
@@ -408,7 +438,15 @@ rmq_init(_Env) ->
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingPublish),
 
 
-  DeclareQueueSessionCreated = #'queue.declare'{queue = <<"session_created">>},
+  DeclareQueueSessionCreated = #'queue.declare'{queue = <<"session_created">>, ticket      = 0,
+                          type        = <<"direct">>,
+                          passive     = false,
+                          durable     = true,
+                          auto_delete = false,
+                          internal    = false,
+                          nowait      = false,
+                          arguments   = []}
+    },
   #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueSessionCreated),
 
   BindingSessionCreated = #'queue.bind'{queue       = <<"session_created">>,
@@ -418,7 +456,15 @@ rmq_init(_Env) ->
 
 
 
-  DeclareQueueSessionSubscriptions = #'queue.declare'{queue = <<"session_subscriptions">>},
+  DeclareQueueSessionSubscriptions = #'queue.declare'{queue = <<"session_subscriptions">>, ticket      = 0,
+                          type        = <<"direct">>,
+                          passive     = false,
+                          durable     = true,
+                          auto_delete = false,
+                          internal    = false,
+                          nowait      = false,
+                          arguments   = []}
+    },
   #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueSessionSubscriptions),
 
   BindingSessionSubscriptions = #'queue.bind'{queue       = <<"session_subscriptions">>,
@@ -427,7 +473,15 @@ rmq_init(_Env) ->
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingSessionSubscriptions),
 
 
-  DeclareQueueSessionUnSubscriptions = #'queue.declare'{queue = <<"session_unsubscriptions">>},
+  DeclareQueueSessionUnSubscriptions = #'queue.declare'{queue = <<"session_unsubscriptions">>, ticket      = 0,
+                          type        = <<"direct">>,
+                          passive     = false,
+                          durable     = true,
+                          auto_delete = false,
+                          internal    = false,
+                          nowait      = false,
+                          arguments   = []}
+    },
   #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueSessionUnSubscriptions),
 
   BindingSessionUnSubscriptions = #'queue.bind'{queue       = <<"session_unsubscriptions">>,
@@ -436,7 +490,15 @@ rmq_init(_Env) ->
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingSessionUnSubscriptions),
 
 
-  DeclareQueueSessionTermination = #'queue.declare'{queue = <<"session_termination">>},
+  DeclareQueueSessionTermination = #'queue.declare'{queue = <<"session_termination">>, ticket      = 0,
+                          type        = <<"direct">>,
+                          passive     = false,
+                          durable     = true,
+                          auto_delete = false,
+                          internal    = false,
+                          nowait      = false,
+                          arguments   = []}
+    },
   #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueSessionTermination),
 
   BindingSessionTermination = #'queue.bind'{queue       = <<"session_termination">>,
@@ -444,7 +506,15 @@ rmq_init(_Env) ->
                                 routing_key = <<"emqttd_session_termination">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingSessionTermination),
 
-  DeclareQueueDeliveryReport = #'queue.declare'{queue = <<"delivery_report">>},
+  DeclareQueueDeliveryReport = #'queue.declare'{queue = <<"delivery_report">>, ticket      = 0,
+                          type        = <<"direct">>,
+                          passive     = false,
+                          durable     = trjue,
+                          auto_delete = false,
+                          internal    = false,
+                          nowait      = false,
+                          arguments   = []}
+    },
   #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueDeliveryReport),
 
   BindingDeliveryReport = #'queue.bind'{queue       = <<"delivery_report">>,
@@ -452,7 +522,15 @@ rmq_init(_Env) ->
                                 routing_key = <<"emqttd_delivery_report">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingDeliveryReport),
 
-  DeclareQueueAckReport = #'queue.declare'{queue = <<"ack_report">>},
+  DeclareQueueAckReport = #'queue.declare'{queue = <<"ack_report">>, ticket      = 0,
+                          type        = <<"direct">>,
+                          passive     = false,
+                          durable     = true,
+                          auto_delete = false,
+                          internal    = false,
+                          nowait      = false,
+                          arguments   = []}
+    },
   #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueAckReport),
 
   BindingAckReport = #'queue.bind'{queue       = <<"ack_report">>,
