@@ -450,7 +450,7 @@ rmq_init(_Env) ->
                                 routing_key = <<"emqttd_session_termination">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingSessionTermination),
 
-  DeclareQueueDeliveryReport = #'queue.declare'{queue = <<"delivery_report">>,},
+  DeclareQueueDeliveryReport = #'queue.declare'{queue = <<"delivery_report">>},
   #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueDeliveryReport),
 
   BindingDeliveryReport = #'queue.bind'{queue       = <<"delivery_report">>,
