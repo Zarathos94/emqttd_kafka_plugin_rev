@@ -1,0 +1,26 @@
+
+{mapping, "emqttd_plugin_kafka_bridge.amqp_client.username", "emqttd_plugin_kafka_bridge.server", [
+  {default, "admin"},
+  {datatype, string}
+]}.
+
+
+{mapping, "emqttd_plugin_kafka_bridge.amqp_client.password", "emqttd_plugin_kafka_bridge.server", [
+  {default, "admin"},
+  {datatype, string}
+]}.
+
+{mapping, "emqttd_plugin_kafka_bridge.amqp_client.virtualhost", "emqttd_plugin_kafka_bridge.server", [
+  {default, "/"},
+  {datatype, string}
+]}.
+
+{mapping, "emqttd_plugin_kafka_bridge.amqp_client.host", "emqttd_plugin_kafka_bridge.server", [
+  {default, "10.1.7.130"},
+  {datatype, string}
+]}.
+
+{mapping, "emqttd_plugin_kafka_bridge.amqp_client.port", "emqttd_plugin_kafka_bridge.server", [
+  {default, 5672},
+  {datatype, integer}
+]}.
