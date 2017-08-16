@@ -1,3 +1,5 @@
+%%-*- mode: erlang -*-
+%% emqttd_plugin_kafka_bridge config mapping
 
 {mapping, "emqttd_plugin_kafka_bridge.amqp_client.username", "emqttd_plugin_kafka_bridge.server", [
   {default, "admin"},
