@@ -1,6 +1,4 @@
 %%%-----------------------------------------------------------------------------
-%%% Copyright (c) 2016 Huang Rui<vowstar@gmail.com>, All Rights Reserved.
-%%%
 %%% Permission is hereby granted, free of charge, to any person obtaining a copy
 %%% of this software and associated documentation files (the "Software"), to deal
 %%% in the Software without restriction, including without limitation the rights
@@ -75,7 +73,6 @@ uuid_to_string(<<I:128>>) ->
 %%-----------client connect start-----------------------------------%%
 
 on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env) ->
-    %io:format("client ~s connected, connack: ~w~n", [ClientId, ConnAck]),
 
     Json = mochijson2:encode([
         {type, <<"connected">>},
@@ -83,10 +80,9 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
         {cluster_node, node()},
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
-    {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
-    %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
+    {ok, Channel3} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel3),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_connected">>},
-    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
+    amqp_channel:cast(Channel3, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
 
     {ok, Client}.
@@ -98,7 +94,6 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
 %%-----------client disconnect start---------------------------------%%
 
 on_client_disconnected(Reason, _Client = #mqtt_client{client_id = ClientId}, _Env) ->
-    %io:format("client ~s disconnected, reason: ~w~n", [ClientId, Reason]),
 
     Json = mochijson2:encode([
         {type, <<"disconnected">>},
@@ -107,10 +102,9 @@ on_client_disconnected(Reason, _Client = #mqtt_client{client_id = ClientId}, _En
         {cluster_node, node()},
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
-    {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
-    %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
+    {ok, Channel3} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel3),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_disconnected">>},
-    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
+    amqp_channel:cast(Channel3, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
 
     ok.
@@ -123,7 +117,6 @@ on_client_disconnected(Reason, _Client = #mqtt_client{client_id = ClientId}, _En
 
 %% should retain TopicTable
 on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
-    %io:format("client ~s subscribed ~p~n", [ClientId, TopicTable]),
     case TopicTable of
         [_|_] ->
             %% If TopicTable list is not empty
@@ -138,7 +131,6 @@ on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
                 {timestamp, erlang:system_time(micro_seconds)}
             ]),
             {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
-            %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
             Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_subscriptions">>},
             amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)});
             %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
@@ -155,7 +147,6 @@ on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
 %%-----------client unsubscribed start----------------------------------------%%
 
 on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
-    %io:format("client ~s(~s) unsubscribe ~p~n", [ClientId, Username, TopicTable]),
     case TopicTable of
         [_|_] ->
             %% If TopicTable list is not empty
@@ -170,7 +161,6 @@ on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
                 {timestamp, erlang:system_time(micro_seconds)}
             ]),
             {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
-            %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
             Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_unsubscriptions">>},
             amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)});
             %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
@@ -188,22 +178,41 @@ on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
 on_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>}, _Env) ->
     {ok, Message};
 
+on_message_publish(Message = #mqtt_message{topic = <<"symbol/", _/binary>>}, _Env) ->
+    {ok, Message};
+
+on_message_publish(Message = #mqtt_message{topic = <<"symbols/", _/binary>>}, _Env) ->
+    {ok, Message};
+
+on_message_publish(Message = #mqtt_message{topic = <<"event_tracking/", _/binary>>}, _Env) ->
+    {ClientId, Username} = Message#mqtt_message.from,
+    MessageId = Message#mqtt_message.id,
+    Topic = Message#mqtt_message.topic,
+    Payload = Message#mqtt_message.payload,
+
+    Json = mochijson2:encode([
+        {type, <<"event_published">>},
+        {client_id, ClientId},
+        {username, Username},
+        {topic, Topic},
+        {payload, Payload},
+        {message_id, emqttd_guid:to_hexstr(MessageId)},
+        {cluster_node, node()},
+        {timestamp, erlang:system_time(micro_seconds)}
+    ]),
+
+    {ok, Channel2} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel2),
+    Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_event_log_route">>},
+    amqp_channel:cast(Channel2, Publish, #amqp_msg{payload = list_to_binary(Json)}),
+    {ok, Message};
+
 on_message_publish(Message, _Env) ->
 
 
     {ClientId, Username} = Message#mqtt_message.from,
-    %Sender =  Message#mqtt_message.sender,
     MessageId = Message#mqtt_message.id,
-    %Retain = Message#mqtt_message.retain,
     Topic = Message#mqtt_message.topic,
-    %Flags = Message#mqtt_message.flags,
-    %Dup = Message#mqtt_message.dup,
-    %Sys = Message#mqtt_message.sys,
-    %Headers = Message#mqtt_message.headers,
     Payload = Message#mqtt_message.payload,
-    %PacketId = Message#mqtt_message.pktid,
-    %QoS = Message#mqtt_message.qos,
-    %io:format("publish ~p ~n", [emqttd_message:format(Message)]),
     Json = mochijson2:encode([
         {type, <<"message_published">>},
         {client_id, ClientId},
@@ -211,29 +220,19 @@ on_message_publish(Message, _Env) ->
         {topic, Topic},
         {payload, Payload},
         {message_id, emqttd_guid:to_hexstr(MessageId)},
-        %{qos, QoS},
-        %{headers,Headers},
-        %{sys, Sys},
-        %{dup, Dup},
-        %{flags, Flags},
-        %{message_id, MessageId},
-        %{packet_id, PacketId},
-        %{retain, Retain},
         {cluster_node, node()},
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
-
-    {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
-    %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
+    
+    {ok, Channel1} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel1),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_publish">>},
-    amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
+    amqp_channel:cast(Channel1, Publish, #amqp_msg{payload = list_to_binary(Json)}),
 
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
 
     {ok, Message}.
 
 on_session_created(ClientId, Username, _Env) ->
-    %io:format("session(~s/~s) created.", [ClientId, Username]),
     Json = mochijson2:encode([
         {type, <<"session_created">>},
         {client_id, ClientId},
@@ -242,13 +241,11 @@ on_session_created(ClientId, Username, _Env) ->
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
-    %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_created">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}).
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
 
 on_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
-    %io:format("session(~s/~s) subscribed: ~p~n", [Username, ClientId, {Topic, Opts}]),
     Json = mochijson2:encode([
         {type, <<"session_subscribed">>},
         {client_id, ClientId},
@@ -258,14 +255,12 @@ on_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
-    %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_subscriptions">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     {ok, {Topic, Opts}}.
 
 on_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
-    %io:format("session(~s/~s) unsubscribed: ~p~n", [Username, ClientId, {Topic, Opts}]),
     Json = mochijson2:encode([
         {type, <<"session_unsubscribed">>},
         {client_id, ClientId},
@@ -275,14 +270,12 @@ on_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
-    %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_unsubscriptions">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
     ok.
 
 on_session_terminated(ClientId, Username, Reason, _Env) ->
-    %io:format("session(~s/~s) terminated: ~p.", [ClientId, Username, Reason]),
     Json = mochijson2:encode([
         {type, <<"session_terminated">>},
         {client_id, ClientId},
@@ -292,7 +285,6 @@ on_session_terminated(ClientId, Username, Reason, _Env) ->
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
-    %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_termination">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}).
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
@@ -300,15 +292,11 @@ on_session_terminated(ClientId, Username, Reason, _Env) ->
 
 %%-----------message delivered start--------------------------------------%%
 on_message_delivered(ClientId, Username, Message, _Env) ->
-    %io:format("delivered to client ~s: ~s~n", [ClientId, emqttd_message:format(Message)]),
 
     {SenderId, SenderName} = Message#mqtt_message.from,
-    %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
     MessageId = Message#mqtt_message.id,
     Payload = Message#mqtt_message.payload,
-    %QoS = Message#mqtt_message.qos,
-    %Timestamp = Message#mqtt_message.timestamp,
 
     Json = mochijson2:encode([
         {type, <<"message_delivered">>},
@@ -319,13 +307,10 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
         {topic, Topic},
         {payload, Payload},
         {message_id, emqttd_guid:to_hexstr(MessageId)},
-        %{qos, QoS},
         {cluster_node, node()},
         {timestamp, erlang:system_time(micro_seconds)}
-        %{ts, Timestamp}
     ]),
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
-    %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_delivery_report">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -335,14 +320,10 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
 
 %%-----------acknowledgement publish start----------------------------%%
 on_message_acked(ClientId, Username, Message, _Env) ->
-    %io:format("client ~s acked: ~s~n", [ClientId, emqttd_message:format(Message)]),
 
     {SenderId, SenderName} = Message#mqtt_message.from,
-    %Sender =  Message#mqtt_message.sender,
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload,
-    %QoS = Message#mqtt_message.qos,
-    %Timestamp = Message#mqtt_message.timestamp,
 
     Json = mochijson2:encode([
         {type, <<"message_acked">>},
@@ -356,8 +337,9 @@ on_message_acked(ClientId, Username, Message, _Env) ->
         {cluster_node, node()}
         %{ts, Timestamp}
     ]),
+
     {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
-    %io:format("Channel: ~p | JSON: ~p", [Channel, Json]),
+
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_ack_report">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -383,6 +365,16 @@ rmq_init(_Env) ->
   }),
   {ok, Channel} = amqp_connection:open_channel(Connection),
   application:set_env(emqttd_plugin_kafka_bridge, rmq_channel, Channel),
+
+  {ok, Channel1} = amqp_connection:open_channel(Connection),
+  application:set_env(emqttd_plugin_kafka_bridge, rmq_channel1, Channel1),
+
+  {ok, Channel2} = amqp_connection:open_channel(Connection),
+  application:set_env(emqttd_plugin_kafka_bridge, rmq_channel2, Channel2),
+
+  {ok, Channel3} = amqp_connection:open_channel(Connection),
+  application:set_env(emqttd_plugin_kafka_bridge, rmq_channel3, Channel3),
+
   DeclareExchange = #'exchange.declare'{exchange = <<"emqttd">>},
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, DeclareExchange),
 
@@ -411,6 +403,15 @@ rmq_init(_Env) ->
   BindingPublish = #'queue.bind'{queue       = <<"publish">>,
                                 exchange    = <<"emqttd">>,
                                 routing_key = <<"emqttd_publish">>},
+  #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingPublish),
+
+
+DeclareQueuePublish = #'queue.declare'{queue = <<"emqttd_event_log">>},
+  #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueuePublish),
+
+  BindingPublish = #'queue.bind'{queue       = <<"emqttd_event_log">>,
+                                exchange    = <<"emqttd">>,
+                                routing_key = <<"emqttd_event_log_route">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingPublish),
 
 
@@ -465,6 +466,7 @@ rmq_init(_Env) ->
                                 exchange    = <<"emqttd">>,
                                 routing_key = <<"emqttd_ack_report">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingDeliveryReport),
+
 
   {ok, _} = application:ensure_all_started(amqp_client),
   io:format("Initialized rabbitmq connection to host: ~p:~p with exchange: ~p on channel: ~p~n", [RMQHost, RMQPort, "emqttd", Channel]).
