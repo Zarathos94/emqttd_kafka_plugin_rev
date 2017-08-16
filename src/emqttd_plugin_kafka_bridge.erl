@@ -350,12 +350,12 @@ on_message_acked(ClientId, Username, Message, _Env) ->
 %% ===================================================================
 
 rmq_init(_Env) ->
-  {ok, Rmq} = application:get_env(emqttd_plugin_kafka_bridge, amqp_client),
-  Virtualhost = proplists:get_value(virtualhost, Rmq),
-  Username = proplists:get_value(username, Rmq),
-  Password = proplists:get_value(password, Rmq),
-  RMQPort = proplists:get_value(port, Rmq),
-  RMQHost = proplists:get_value(host, Rmq),
+  %%{ok, Rmq} = application:get_env(emqttd_plugin_kafka_bridge, amqp_client),
+  Virtualhost = proplists:get_value(?APP, virtualhost),
+  Username = proplists:get_value(?APP, username),
+  Password = proplists:get_value(?APP, password),
+  RMQPort = proplists:get_value(?APP, port),
+  RMQHost = proplists:get_value(?APP, host),
   {ok, Connection} = amqp_connection:start(#amqp_params_network{
     username = Username, password = Password, virtual_host = Virtualhost,
     host = RMQHost, port = RMQPort,

@@ -35,7 +35,7 @@
 
 start(_StartType, _StartArgs) ->
     {ok, Sup} = emqttd_plugin_kafka_bridge_sup:start_link(),
-    emqttd_plugin_kafka_bridge:load(application:get_all_env()),
+    %%emqttd_plugin_kafka_bridge:load(application:get_all_env()),
     %%emqttd_plugin_kafka_bridge_config:register(),
     {ok, Sup}.
 
