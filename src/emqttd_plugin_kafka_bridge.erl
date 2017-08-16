@@ -31,6 +31,7 @@
 -include("../../emqttd/include/emqttd_internal.hrl").
 
 -include("../../amqp_client/include/amqp_client.hrl").
+-define(APP, emqttd_plugin_kafka_bridge).
 
 -export([load/1, unload/0]).
 
