@@ -13,7 +13,7 @@
 %% See the License for the specific language governing permissions and
 %% limitations under the License.
 %%--------------------------------------------------------------------
--module (emqttd_plugin_kafka_bridge).
+-module (emqttd_plugin_kafka_bridge_config).
 
 -define(APP, emqttd_plugin_kafka_bridge).
 
