@@ -357,6 +357,7 @@ rmq_init(_Env) ->
   Password = proplists:get_value(?APP, password),
   RMQPort = proplists:get_value(?APP, port),
   RMQHost = proplists:get_value(?APP, host),
+  io:format("Trying to connect to:  ~p~n", [RMQHost])
   {ok, Connection} = amqp_connection:start(#amqp_params_network{
     username = Username, password = Password, virtual_host = Virtualhost,
     host = RMQHost, port = RMQPort,
@@ -365,16 +366,16 @@ rmq_init(_Env) ->
     client_properties = [], socket_options = []
   }),
   {ok, Channel} = amqp_connection:open_channel(Connection),
-  application:set_env(emqttd_plugin_kafka_bridge, rmq_channel, Channel),
+  application:set_env(?APP, rmq_channel, Channel),
 
   {ok, Channel1} = amqp_connection:open_channel(Connection),
-  application:set_env(emqttd_plugin_kafka_bridge, rmq_channel1, Channel1),
+  application:set_env(?APP, rmq_channel1, Channel1),
 
   {ok, Channel2} = amqp_connection:open_channel(Connection),
-  application:set_env(emqttd_plugin_kafka_bridge, rmq_channel2, Channel2),
+  application:set_env(?APP, rmq_channel2, Channel2),
 
   {ok, Channel3} = amqp_connection:open_channel(Connection),
-  application:set_env(emqttd_plugin_kafka_bridge, rmq_channel3, Channel3),
+  application:set_env(?APP, rmq_channel3, Channel3),
 
   DeclareExchange = #'exchange.declare'{exchange = <<"emqttd">>},
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, DeclareExchange),
