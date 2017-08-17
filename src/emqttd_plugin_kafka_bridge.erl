@@ -58,7 +58,7 @@ load() ->
     emqttd:hook('session.unsubscribed', fun ?MODULE:on_session_unsubscribed/4, [application.get_env(?APP)]),
     emqttd:hook('session.terminated', fun ?MODULE:on_session_terminated/4, [application.get_env(?APP)]),
     emqttd:hook('message.publish', fun ?MODULE:on_message_publish/2, [application.get_env(?APP)]),
-    emqttd:hook('message.delivered', fun ?MODULE:on_message_delivered/4, [application.get_env(?APP)Env]),
+    emqttd:hook('message.delivered', fun ?MODULE:on_message_delivered/4, [application.get_env(?APP)]),
     emqttd:hook('message.acked', fun ?MODULE:on_message_acked/4, [application.get_env(?APP)]).
 
 
