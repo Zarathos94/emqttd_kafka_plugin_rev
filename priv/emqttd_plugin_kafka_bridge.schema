@@ -40,5 +40,6 @@
    {port, Port},
    {username, Username},
    {password, Passwd},
-   {virtualhost, Virtualhost}]
+   {virtualhost, Virtualhost}
+  ]
 end}.
