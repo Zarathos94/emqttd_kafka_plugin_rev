@@ -48,7 +48,7 @@
 %% Called when the plugin application start
 load(Env) ->
     %ekaf_init([Env]),
-    rmq_init([Env]),
+    rmq_init(),
     emqttd:hook('client.connected', fun ?MODULE:on_client_connected/3, [Env]),
     emqttd:hook('client.disconnected', fun ?MODULE:on_client_disconnected/3, [Env]),
     emqttd:hook('client.subscribe', fun ?MODULE:on_client_subscribe/4, [Env]),
@@ -350,7 +350,7 @@ on_message_acked(ClientId, Username, Message, _Env) ->
 %% rmq_init
 %% ===================================================================
 
-rmq_init(_Env) ->
+rmq_init() ->
   %%{ok, Rmq} = application:get_env(emqttd_plugin_kafka_bridge, amqp_client),
   Virtualhost = proplists:get_value(?APP, virtualhost),
   Username = proplists:get_value(?APP, username),
