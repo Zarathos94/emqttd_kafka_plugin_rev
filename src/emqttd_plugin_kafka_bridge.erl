@@ -408,13 +408,13 @@ rmq_init() ->
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingPublish),
 
 
-DeclareQueuePublish = #'queue.declare'{queue = <<"emqttd_event_log">>},
-  #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueuePublish),
-
-  BindingPublish = #'queue.bind'{queue       = <<"emqttd_event_log">>,
+  EventQueueDeclare = #'queue.declare'{queue = <<"emqttd_event_log">>},
+  #'queue.declare_ok'{} = amqp_channel:call(Channel, EventQueueDeclare),
+  
+  BindingEventPublish = #'queue.bind'{queue       = <<"emqttd_event_log">>,
                                 exchange    = <<"emqttd">>,
                                 routing_key = <<"emqttd_event_log_route">>},
-  #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingPublish),
+  #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingEventPublish),
 
 
   DeclareQueueSessionCreated = #'queue.declare'{queue = <<"session_created">>},
