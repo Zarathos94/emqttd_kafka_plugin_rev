@@ -351,12 +351,12 @@ on_message_acked(ClientId, Username, Message, _Env) ->
 %% ===================================================================
 
 rmq_init() ->
-  %%{ok, Rmq} = application:get_env(emqttd_plugin_kafka_bridge, amqp_client),
-  Virtualhost = application:get_env(?APP, virtualhost, "/"),
-  Username = application:get_env(?APP, username),
-  Password = application:get_env(?APP, password),
-  RMQPort = application:get_env(?APP, port),
-  RMQHost = application:get_env(?APP, host),
+  {ok, Rmq} = application:get_env(?APP, amqp_client),
+  Virtualhost = proplists:get_value(Rmq, virtualhost, "/"),
+  Username = proplists:get_value(Rmq, username),
+  Password = proplists:get_value(Rmq, password),
+  RMQPort = proplists:get_value(Rmq, port),
+  RMQHost = proplists:get_value(Rmq, host),
   io:format("Trying to connect to:  ~p~n", [RMQHost]),
   {ok, Connection} = amqp_connection:start(#amqp_params_network{
     username = Username, password = Password, virtual_host = Virtualhost,
