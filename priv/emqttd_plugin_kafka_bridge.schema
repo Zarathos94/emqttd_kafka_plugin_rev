@@ -21,20 +21,3 @@
 {mapping, "emqttd_plugin_kafka_bridge.amqp_client.port", "emqttd_plugin_kafka_bridge.port", [
   {datatype, integer}
 ]}.
-
-
-{translation, "emqttd_plugin_kafka_bridge.server", fun(Conf) ->
-  
-  Username = cuttlefish:conf_get("emqttd_plugin_kafka_bridge.amqp_client.username", Conf),
-  Passwd = cuttlefish:conf_get("emqttd_plugin_kafka_bridge.amqp_client.password", Conf, ""),
-  Host = cuttlefish:conf_get("emqttd_plugin_kafka_bridge.amqp_client.host", Conf),
-  Port = cuttlefish:conf_get("emqttd_plugin_kafka_bridge.amqp_client.port", Conf),
-  Virtualhost = cuttlefish:conf_get("emqttd_plugin_kafka_bridge.amqp_client.virtualhost", Conf),
-  [
-   {host, Host},
-   {port, Port},
-   {username, Username},
-   {password, Passwd},
-   {virtualhost, Virtualhost}
-  ]
-end}.
