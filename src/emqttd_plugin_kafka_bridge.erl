@@ -33,7 +33,7 @@
 -include("../../amqp_client/include/amqp_client.hrl").
 -define(APP, emqttd_plugin_kafka_bridge).
 
--export([load/1, unload/0]).
+-export([load/0, unload/0]).
 
 %% Hooks functions
 -export([on_client_connected/3, on_client_disconnected/3]).
@@ -46,20 +46,20 @@
 
 -export([uuid_to_string/1]).
 %% Called when the plugin application start
-load(Env) ->
+load() ->
     %ekaf_init([Env]),
     rmq_init(),
-    emqttd:hook('client.connected', fun ?MODULE:on_client_connected/3, [Env]),
-    emqttd:hook('client.disconnected', fun ?MODULE:on_client_disconnected/3, [Env]),
-    emqttd:hook('client.subscribe', fun ?MODULE:on_client_subscribe/4, [Env]),
-    emqttd:hook('client.unsubscribe', fun ?MODULE:on_client_unsubscribe/4, [Env]),
-    emqttd:hook('session.created', fun ?MODULE:on_session_created/3, [Env]),
-    emqttd:hook('session.subscribed', fun ?MODULE:on_session_subscribed/4, [Env]),
-    emqttd:hook('session.unsubscribed', fun ?MODULE:on_session_unsubscribed/4, [Env]),
-    emqttd:hook('session.terminated', fun ?MODULE:on_session_terminated/4, [Env]),
-    emqttd:hook('message.publish', fun ?MODULE:on_message_publish/2, [Env]),
-    emqttd:hook('message.delivered', fun ?MODULE:on_message_delivered/4, [Env]),
-    emqttd:hook('message.acked', fun ?MODULE:on_message_acked/4, [Env]).
+    emqttd:hook('client.connected', fun ?MODULE:on_client_connected/3, [application.get_env(?APP)]),
+    emqttd:hook('client.disconnected', fun ?MODULE:on_client_disconnected/3, [application.get_env(?APP)]),
+    emqttd:hook('client.subscribe', fun ?MODULE:on_client_subscribe/4, [application.get_env(?APP)]),
+    emqttd:hook('client.unsubscribe', fun ?MODULE:on_client_unsubscribe/4, [application.get_env(?APP)]),
+    emqttd:hook('session.created', fun ?MODULE:on_session_created/3, [application.get_env(?APP)]),
+    emqttd:hook('session.subscribed', fun ?MODULE:on_session_subscribed/4, [application.get_env(?APP)]),
+    emqttd:hook('session.unsubscribed', fun ?MODULE:on_session_unsubscribed/4, [application.get_env(?APP)]),
+    emqttd:hook('session.terminated', fun ?MODULE:on_session_terminated/4, [application.get_env(?APP)]),
+    emqttd:hook('message.publish', fun ?MODULE:on_message_publish/2, [application.get_env(?APP)]),
+    emqttd:hook('message.delivered', fun ?MODULE:on_message_delivered/4, [application.get_env(?APP)Env]),
+    emqttd:hook('message.acked', fun ?MODULE:on_message_acked/4, [application.get_env(?APP)]).
 
 
 
