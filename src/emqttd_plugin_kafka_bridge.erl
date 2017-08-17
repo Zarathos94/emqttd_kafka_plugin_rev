@@ -357,7 +357,7 @@ rmq_init(_Env) ->
   Password = proplists:get_value(?APP, password),
   RMQPort = proplists:get_value(?APP, port),
   RMQHost = proplists:get_value(?APP, host),
-  io:format("Trying to connect to:  ~p~n", [RMQHost])
+  io:format("Trying to connect to:  ~p~n", [RMQHost]),
   {ok, Connection} = amqp_connection:start(#amqp_params_network{
     username = Username, password = Password, virtual_host = Virtualhost,
     host = RMQHost, port = RMQPort,
