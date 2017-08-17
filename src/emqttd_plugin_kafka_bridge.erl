@@ -351,7 +351,7 @@ on_message_acked(ClientId, Username, Message, _Env) ->
 %% ===================================================================
 
 rmq_init() ->
-  {ok, Rmq} = application:get_env(?APP, amqp_client),
+  {ok, Rmq} = application:get_env(?APP, server),
   Virtualhost = proplists:get_value(Rmq, virtualhost, "/"),
   Username = proplists:get_value(Rmq, username),
   Password = proplists:get_value(Rmq, password),
