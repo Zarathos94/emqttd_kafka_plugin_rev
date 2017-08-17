@@ -81,7 +81,7 @@ on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env)
         {cluster_node, node()},
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
-    {ok, Channel3} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel3),
+    {ok, Channel3} = application:get_env(?APP, rmq_channel3),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_connected">>},
     amqp_channel:cast(Channel3, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -103,7 +103,7 @@ on_client_disconnected(Reason, _Client = #mqtt_client{client_id = ClientId}, _En
         {cluster_node, node()},
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
-    {ok, Channel3} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel3),
+    {ok, Channel3} = application:get_env(?APP, rmq_channel3),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_disconnected">>},
     amqp_channel:cast(Channel3, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -131,7 +131,7 @@ on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
                 {cluster_node, node()},
                 {timestamp, erlang:system_time(micro_seconds)}
             ]),
-            {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
+            {ok, Channel} = application:get_env(?APP, rmq_channel),
             Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_subscriptions">>},
             amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)});
             %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
@@ -161,7 +161,7 @@ on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
                 {cluster_node, node()},
                 {timestamp, erlang:system_time(micro_seconds)}
             ]),
-            {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
+            {ok, Channel} = application:get_env(?APP, rmq_channel),
             Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_unsubscriptions">>},
             amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)});
             %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json));
@@ -202,8 +202,8 @@ on_message_publish(Message = #mqtt_message{topic = <<"event_tracking/", _/binary
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
 
-    {ok, Channel2} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel2),
-    Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_event_log_route">>},
+    {ok, Channel2} = application:get_env(?APP, rmq_channel2),
+    Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"event_log_route">>},
     amqp_channel:cast(Channel2, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     {ok, Message};
 
@@ -225,7 +225,7 @@ on_message_publish(Message, _Env) ->
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
     
-    {ok, Channel1} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel1),
+    {ok, Channel1} = application:get_env(?APP, rmq_channel1),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_publish">>},
     amqp_channel:cast(Channel1, Publish, #amqp_msg{payload = list_to_binary(Json)}),
 
@@ -241,7 +241,7 @@ on_session_created(ClientId, Username, _Env) ->
         {cluster_node, node()},
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
-    {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
+    {ok, Channel} = application:get_env(?APP, rmq_channel),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_created">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}).
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
@@ -255,7 +255,7 @@ on_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
         {cluster_node, node()},
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
-    {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
+    {ok, Channel} = application:get_env(?APP, rmq_channel),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_subscriptions">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -270,7 +270,7 @@ on_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
         {cluster_node, node()},
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
-    {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
+    {ok, Channel} = application:get_env(?APP, rmq_channel),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_unsubscriptions">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -285,7 +285,7 @@ on_session_terminated(ClientId, Username, Reason, _Env) ->
         {cluster_node, node()},
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
-    {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
+    {ok, Channel} = application:get_env(?APP, rmq_channel),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_session_termination">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}).
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)).
@@ -311,7 +311,7 @@ on_message_delivered(ClientId, Username, Message, _Env) ->
         {cluster_node, node()},
         {timestamp, erlang:system_time(micro_seconds)}
     ]),
-    {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
+    {ok, Channel} = application:get_env(?APP, rmq_channel),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_delivery_report">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     %ekaf:produce_async_batched(<<"broker_message">>, list_to_binary(Json)),
@@ -339,7 +339,7 @@ on_message_acked(ClientId, Username, Message, _Env) ->
         %{ts, Timestamp}
     ]),
 
-    {ok, Channel} = application:get_env(emqttd_plugin_kafka_bridge, rmq_channel),
+    {ok, Channel} = application:get_env(?APP, rmq_channel),
 
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_ack_report">>},
     amqp_channel:cast(Channel, Publish, #amqp_msg{payload = list_to_binary(Json)}),
@@ -408,12 +408,12 @@ rmq_init() ->
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingPublish),
 
 
-  EventQueueDeclare = #'queue.declare'{queue = <<"emqttd_event_log">>},
+  EventQueueDeclare = #'queue.declare'{queue = <<"event_log">>},
   #'queue.declare_ok'{} = amqp_channel:call(Channel, EventQueueDeclare),
-  
-  BindingEventPublish = #'queue.bind'{queue       = <<"emqttd_event_log">>,
+
+  BindingEventPublish = #'queue.bind'{queue       = <<"event_log">>,
                                 exchange    = <<"emqttd">>,
-                                routing_key = <<"emqttd_event_log_route">>},
+                                routing_key = <<"event_log_route">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingEventPublish),
 
 
@@ -467,7 +467,7 @@ rmq_init() ->
   BindingAckReport = #'queue.bind'{queue       = <<"ack_report">>,
                                 exchange    = <<"emqttd">>,
                                 routing_key = <<"emqttd_ack_report">>},
-  #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingDeliveryReport),
+  #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingAckReport),
 
 
   {ok, _} = application:ensure_all_started(amqp_client),
