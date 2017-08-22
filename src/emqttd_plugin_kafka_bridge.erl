@@ -185,6 +185,28 @@ on_message_publish(Message = #mqtt_message{topic = <<"symbol/", _/binary>>}, _En
 on_message_publish(Message = #mqtt_message{topic = <<"symbols/", _/binary>>}, _Env) ->
     {ok, Message};
 
+on_message_publish(Message = #mqtt_message{topic = <<"dlr/", _/binary>>}, _Env) ->
+    {ClientId, Username} = Message#mqtt_message.from,
+    MessageId = Message#mqtt_message.id,
+    Topic = Message#mqtt_message.topic,
+    Payload = Message#mqtt_message.payload,
+    
+    Json = mochijson2:encode([
+        {type, <<"dlr">>},
+        {client_id, ClientId},
+        {username, Username},
+        {topic, Topic},
+        {payload, Payload},
+        {message_id, emqttd_guid:to_hexstr(MessageId)},
+        {cluster_node, node()},
+        {timestamp, erlang:system_time(micro_seconds)}
+    ]),
+    
+    {ok, Channel2} = application:get_env(?APP, rmq_channel2),
+    Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"emqttd_dlr">>},
+    amqp_channel:cast(Channel2, Publish, #amqp_msg{payload = list_to_binary(Json)}),
+    {ok, Message};
+
 on_message_publish(Message = #mqtt_message{topic = <<"event_tracking/", _/binary>>}, _Env) ->
     {ClientId, Username} = Message#mqtt_message.from,
     MessageId = Message#mqtt_message.id,
@@ -398,6 +420,13 @@ rmq_init() ->
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingDisconnected),
 
 
+  DeclareQueueDLR = #'queue.declare'{queue = <<"dlr">>},
+  #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueDLR),
+
+  BindingDLR = #'queue.bind'{queue       = <<"dlq">>,
+                                exchange    = <<"emqttd">>,
+                                routing_key = <<"emqttd_dlr">>},
+  #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingDLR),
 
   DeclareQueuePublish = #'queue.declare'{queue = <<"publish">>},
   #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueuePublish),
