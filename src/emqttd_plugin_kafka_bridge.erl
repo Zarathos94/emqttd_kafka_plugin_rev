@@ -423,7 +423,7 @@ rmq_init() ->
   DeclareQueueDLR = #'queue.declare'{queue = <<"dlr">>},
   #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueDLR),
 
-  BindingDLR = #'queue.bind'{queue       = <<"dlq">>,
+  BindingDLR = #'queue.bind'{queue       = <<"dlr">>,
                                 exchange    = <<"emqttd">>,
                                 routing_key = <<"emqttd_dlr">>},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingDLR),
