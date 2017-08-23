@@ -185,7 +185,7 @@ on_message_publish(Message = #mqtt_message{topic = <<"symbol/", _/binary>>}, _En
 on_message_publish(Message = #mqtt_message{topic = <<"symbols/", _/binary>>}, _Env) ->
     {ok, Message};
 
-on_message_publish(Message = #mqtt_message{topic = <<"dlr/", _/binary>>}, _Env) ->
+on_message_publish(Message = #mqtt_message{topic = <<"dlr">>}, _Env) ->
     {ClientId, Username} = Message#mqtt_message.from,
     MessageId = Message#mqtt_message.id,
     Topic = Message#mqtt_message.topic,
