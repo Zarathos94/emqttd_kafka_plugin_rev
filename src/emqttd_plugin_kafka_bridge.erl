@@ -379,7 +379,9 @@ rmq_init() ->
   {ok, Password} = application:get_env(?APP, password),
   {ok, RMQPort} = application:get_env(?APP, port),
   {ok, RMQHost} = application:get_env(?APP, host),
+  {ok, RMQRoutes} = application:get_env(?APP, routing_config),
   io:format("Trying to connect to:  ~p~n", [RMQHost]),
+  io:format("RMQ Routes:  ~p~n", [RMQRoutes]),
   {ok, Connection} = amqp_connection:start(#amqp_params_network{
     username = list_to_binary(Username), password = list_to_binary(Password), virtual_host = list_to_binary(Virtualhost),
     host = RMQHost, port = RMQPort,

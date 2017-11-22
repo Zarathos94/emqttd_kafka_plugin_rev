@@ -22,6 +22,9 @@
   {datatype, integer}
 ]}.
 
+{mapping, "emqttd_plugin_kafka_bridge.amqp_client.routing_config", "emqttd_plugin_kafka_bridge.routing_config", [
+  {datatype, list}
+]}.
 
 {translation, "emqttd_plugin_kafka_bridge.server", fun(Conf) ->
   
