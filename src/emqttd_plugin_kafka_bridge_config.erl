@@ -59,6 +59,5 @@ keys() ->
         "emqttd_plugin_kafka_bridge.amqp_client.password", 
         "emqttd_plugin_kafka_bridge.amqp_client.virtualhost",
         "emqttd_plugin_kafka_bridge.amqp_client.host", 
-        "emqttd_plugin_kafka_bridge.amqp_client.port",
-        "emqttd_plugin_kafka_bridge.amqp_client.route_mappings"
+        "emqttd_plugin_kafka_bridge.amqp_client.port"
         ].
