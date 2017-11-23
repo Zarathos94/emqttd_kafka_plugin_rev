@@ -415,7 +415,7 @@ rmq_init() ->
         exchange    = <<"emqttd">>,
         routing_key = list_to_atom(lists:last(lists:reverse(string:tokens(H, "."))))},
         #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingPublish),
-    io:format("Route:  ~p~n", [string:tokens(H, .)])
+    io:format("Route:  ~p~n", [string:tokens(H, ".")])
     end,
     string:tokens(RMQRoutes, ",")),
 
