@@ -404,6 +404,13 @@ rmq_init() ->
   DeclareExchange = #'exchange.declare'{exchange = <<"emqttd">>},
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, DeclareExchange),
 
+  foreach(fun(H) -> 
+        io:format("Route:  ~p~n", [H]),
+      end,
+  string:split(RMQRoutes, ",")),
+
+
+
   %% ============================== Queue bindings and declarations ========================
   DeclareQueueConnected = #'queue.declare'{queue = <<"connected">>},
   #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueConnected),
