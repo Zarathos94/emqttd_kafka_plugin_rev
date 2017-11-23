@@ -45,6 +45,9 @@
 -export([on_message_publish/2, on_message_delivered/4, on_message_acked/4]).
 
 -export([uuid_to_string/1]).
+
+-export([foreach/2]).
+
 %% Called when the plugin application start
 load() ->
     %ekaf_init([Env]),
@@ -67,8 +70,6 @@ uuid_to_string(<<I:128>>) ->
   integer_to_list(I, 32).
 
 %% ---------- Cluster support -------------------------------------%%
-
-
 
 foreach(F, [H|T]) ->
     F(H),
@@ -408,10 +409,11 @@ rmq_init() ->
   DeclareExchange = #'exchange.declare'{exchange = <<"emqttd">>},
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, DeclareExchange),
 
-  foreach(fun(H) -> 
-        io:format("Route:  ~p~n", [H])
-      end,
-  string:split(RMQRoutes, ",")),
+    foreach(fun(H) -> 
+    
+    io:format("Route:  ~p~n", [H])
+    end,
+    string:tokens(RMQRoutes, ",")),
 
 
 
