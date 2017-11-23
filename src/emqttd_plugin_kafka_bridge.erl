@@ -190,6 +190,11 @@ on_message_publish(Message = #mqtt_message{topic = <<"symbol/", _/binary>>}, _En
 on_message_publish(Message = #mqtt_message{topic = <<"symbols/", _/binary>>}, _Env) ->
     {ok, Message};
 
+on_message_publish(Message = #mqtt_message{topic = <<"chat/", _/binary}, _Env) ->
+    Topic = Message#mqtt_message.topic,
+    
+    {ok, Message};
+
 on_message_publish(Message = #mqtt_message{topic = <<"dlr">>}, _Env) ->
     {ClientId, Username} = Message#mqtt_message.from,
     MessageId = Message#mqtt_message.id,
@@ -410,11 +415,12 @@ rmq_init() ->
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, DeclareExchange),
 
     foreach(fun(H) -> 
-        %%lists:last(lists:reverse(string:tokens("history.emq_history", "."))).
-        BindingPublish = #'queue.bind'{queue       = list_to_binary(lists:last(string:tokens(H, "."))),
+        DeclareQueueList = #'queue.declare'{queue = <<"connected">>},
+        #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueList),
+        BindingQueueList = #'queue.bind'{queue       = list_to_binary(lists:last(string:tokens(H, "."))),
         exchange    = <<"emqttd">>,
         routing_key = list_to_binary(lists:last(lists:reverse(string:tokens(H, "."))))},
-        #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingPublish),
+        #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingQueueList),
     io:format("Route:  ~p~n", [string:tokens(H, ".")])
     end,
     string:tokens(RMQRoutes, ",")),
