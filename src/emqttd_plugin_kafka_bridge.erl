@@ -190,7 +190,7 @@ on_message_publish(Message = #mqtt_message{topic = <<"symbol/", _/binary>>}, _En
 on_message_publish(Message = #mqtt_message{topic = <<"symbols/", _/binary>>}, _Env) ->
     {ok, Message};
 
-on_message_publish(Message = #mqtt_message{topic = <<"chat/", _/binary}, _Env) ->
+on_message_publish(Message = #mqtt_message{topic = <<"chat/", _/binary>>}, _Env) ->
         {ClientId, Username} = Message#mqtt_message.from,
         MessageId = Message#mqtt_message.id,
         Topic = Message#mqtt_message.topic,
@@ -211,7 +211,7 @@ on_message_publish(Message = #mqtt_message{topic = <<"chat/", _/binary}, _Env) -
     amqp_channel:cast(Channel1, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     {ok, Message};
 
-on_message_publish(Message = #mqtt_message{topic = <<"thread/", _/binary}, _Env) ->
+on_message_publish(Message = #mqtt_message{topic = <<"thread/", _/binary>>}, _Env) ->
         {ClientId, Username} = Message#mqtt_message.from,
         MessageId = Message#mqtt_message.id,
         Topic = Message#mqtt_message.topic,
