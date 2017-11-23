@@ -70,7 +70,11 @@ uuid_to_string(<<I:128>>) ->
 
 
 
-
+foreach(F, [H|T]) ->
+    F(H),
+    foreach(F, T);
+foreach(F, []) ->
+    ok.
 %%-----------client connect start-----------------------------------%%
 
 on_client_connected(ConnAck, Client = #mqtt_client{client_id  = ClientId}, _Env) ->
