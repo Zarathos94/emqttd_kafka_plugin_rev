@@ -196,7 +196,7 @@ on_message_publish(Message = #mqtt_message{topic = <<"chat/", _/binary>>}, _Env)
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload,
     {ok, RMQRoutes} = application:get_env(?APP, routing_config),
-    Index = string:str(RMQRoutes, binary_to_list(Topic)),
+    Index = string:str(RMQRoutes, lists:last(string:tokens(binary_to_list(Topic), "/"))),
     if Index > 0 ->
             Json = mochijson2:encode([
                 {type, <<"chat_event">>},
@@ -224,7 +224,7 @@ on_message_publish(Message = #mqtt_message{topic = <<"thread/", _/binary>>}, _En
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload,
     {ok, RMQRoutes} = application:get_env(?APP, routing_config),
-    Index = string:str(RMQRoutes, binary_to_list(Topic)),
+    Index = string:str(RMQRoutes, lists:last(string:tokens(binary_to_list(Topic), "/"))),
     if Index > 0 ->
                 Json = mochijson2:encode([
                     {type, <<"chat_event">>},
@@ -470,7 +470,7 @@ rmq_init() ->
         exchange    = <<"emqttd">>,
         routing_key = list_to_binary(lists:last(lists:reverse(string:tokens(H, "."))))},
         #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingQueueList),
-    io:format("Binding route :  ~p to ~p ~n", [lists:last(string:tokens(H, ".")), lists:last(lists:reverse(string:tokens(H, ".")))])
+    io:format("Binding route : ~p to ~p ~n", [lists:last(string:tokens(H, ".")), lists:last(lists:reverse(string:tokens(H, ".")))])
     end,
     string:tokens(RMQRoutes, ",")),
 
