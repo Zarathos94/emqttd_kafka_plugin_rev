@@ -411,9 +411,9 @@ rmq_init() ->
 
     foreach(fun(H) -> 
         %%lists:last(lists:reverse(string:tokens("history.emq_history", "."))).
-        BindingPublish = #'queue.bind'{queue       = list_to_atom(lists:last(string:tokens(H, "."))),
+        BindingPublish = #'queue.bind'{queue       = list_to_binary(lists:last(string:tokens(H, "."))),
         exchange    = <<"emqttd">>,
-        routing_key = list_to_atom(lists:last(lists:reverse(string:tokens(H, "."))))},
+        routing_key = list_to_binary(lists:last(lists:reverse(string:tokens(H, "."))))},
         #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingPublish),
     io:format("Route:  ~p~n", [string:tokens(H, ".")])
     end,
