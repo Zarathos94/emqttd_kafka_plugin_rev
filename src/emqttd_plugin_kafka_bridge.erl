@@ -196,8 +196,8 @@ on_message_publish(Message = #mqtt_message{topic = <<"chat/", _/binary>>}, _Env)
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload,
     {ok, RMQRoutes} = application:get_env(?APP, routing_config),
-    if 
-        string:str(RMQRoutes, binary_to_list(Topic)) > 0 ->
+    Index = string:str(RMQRoutes, binary_to_list(Topic)),
+    if Index > 0 ->
             Json = mochijson2:encode([
                 {type, <<"chat_event">>},
                 {client_id, ClientId},
@@ -224,8 +224,8 @@ on_message_publish(Message = #mqtt_message{topic = <<"thread/", _/binary>>}, _En
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload,
     {ok, RMQRoutes} = application:get_env(?APP, routing_config),
-    if 
-            string:str(RMQRoutes, binary_to_list(Topic)) > 0 ->
+    Index = string:str(RMQRoutes, binary_to_list(Topic)),
+    if Index > 0 ->
                 Json = mochijson2:encode([
                     {type, <<"chat_event">>},
                     {client_id, ClientId},
