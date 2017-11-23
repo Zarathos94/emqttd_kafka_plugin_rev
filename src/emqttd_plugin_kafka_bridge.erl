@@ -452,7 +452,7 @@ rmq_init() ->
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, DeclareExchange),
 
     foreach(fun(H) -> 
-        DeclareQueueList = #'queue.declare'{queue = <<"connected">>},
+        DeclareQueueList = #'queue.declare'{queue = list_to_binary(lists:last(string:tokens(H, ".")))},
         #'queue.declare_ok'{} = amqp_channel:call(Channel, DeclareQueueList),
         BindingQueueList = #'queue.bind'{queue       = list_to_binary(lists:last(string:tokens(H, "."))),
         exchange    = <<"emqttd">>,
