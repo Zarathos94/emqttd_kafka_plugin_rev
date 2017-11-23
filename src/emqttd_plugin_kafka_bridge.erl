@@ -192,7 +192,16 @@ on_message_publish(Message = #mqtt_message{topic = <<"symbols/", _/binary>>}, _E
 
 on_message_publish(Message = #mqtt_message{topic = <<"chat/", _/binary}, _Env) ->
     Topic = Message#mqtt_message.topic,
-    
+    {ok, Channel1} = application:get_env(?APP, rmq_channel1),
+    Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = list_to_binary(lists:last(string:tokens(binary_to_list(Topic), "/")))},
+    amqp_channel:cast(Channel1, Publish, #amqp_msg{payload = list_to_binary(Json)}),
+    {ok, Message};
+
+on_message_publish(Message = #mqtt_message{topic = <<"thread/", _/binary}, _Env) ->
+        Topic = Message#mqtt_message.topic,
+        {ok, Channel1} = application:get_env(?APP, rmq_channel1),
+        Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = list_to_binary(lists:last(string:tokens(binary_to_list(Topic), "/")))},
+        amqp_channel:cast(Channel1, Publish, #amqp_msg{payload = list_to_binary(Json)}),
     {ok, Message};
 
 on_message_publish(Message = #mqtt_message{topic = <<"dlr">>}, _Env) ->
@@ -391,7 +400,7 @@ rmq_init() ->
   {ok, RMQHost} = application:get_env(?APP, host),
   {ok, RMQRoutes} = application:get_env(?APP, routing_config),
   io:format("Trying to connect to:  ~p~n", [RMQHost]),
-  io:format("RMQ Routes:  ~p~n", [RMQRoutes]),
+  
   {ok, Connection} = amqp_connection:start(#amqp_params_network{
     username = list_to_binary(Username), password = list_to_binary(Password), virtual_host = list_to_binary(Virtualhost),
     host = RMQHost, port = RMQPort,
@@ -421,7 +430,7 @@ rmq_init() ->
         exchange    = <<"emqttd">>,
         routing_key = list_to_binary(lists:last(lists:reverse(string:tokens(H, "."))))},
         #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingQueueList),
-    io:format("Route:  ~p~n", [string:tokens(H, ".")])
+    io:format("Binding route :  ~p to ~p ~n", [lists:last(string:tokens(H, ".")), lists:last(lists:reverse(string:tokens(H, ".")))])
     end,
     string:tokens(RMQRoutes, ",")),
 
