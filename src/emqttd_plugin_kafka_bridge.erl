@@ -405,7 +405,7 @@ rmq_init() ->
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, DeclareExchange),
 
   foreach(fun(H) -> 
-        io:format("Route:  ~p~n", [H]),
+        io:format("Route:  ~p~n", [H])
       end,
   string:split(RMQRoutes, ",")),
 
