@@ -410,8 +410,12 @@ rmq_init() ->
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, DeclareExchange),
 
     foreach(fun(H) -> 
-    
-    io:format("Route:  ~p~n", [H])
+            %%lists:last(lists:reverse(string:tokens("history.emq_history", "."))).
+        BindingPublish = #'queue.bind'{queue       = <<lists:last(string:tokens(H, "."))>>,
+        exchange    = <<"emqttd">>,
+        routing_key = <<lists:last(lists:reverse(string:tokens(H, ".")))>>},
+        #'queue.bind_ok'{} = amqp_channel:call(Channel, BindingPublish),
+    io:format("Route:  ~p~n", [string:tokens(H, .)])
     end,
     string:tokens(RMQRoutes, ",")),
 
