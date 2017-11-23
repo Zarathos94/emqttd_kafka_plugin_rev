@@ -196,20 +196,21 @@ on_message_publish(Message = #mqtt_message{topic = <<"chat/", _/binary>>}, _Env)
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload,
     {ok, RMQRoutes} = application:get_env(?APP, routing_config),
-    if(string:str(RMQRoutes, binary_to_list(Topic)) > 0) ->
-        Json = mochijson2:encode([
-            {type, <<"chat_event">>},
-            {client_id, ClientId},
-            {username, Username},
-            {topic, Topic},
-            {payload, Payload},
-            {message_id, emqttd_guid:to_hexstr(MessageId)},
-            {cluster_node, node()},
-            {timestamp, erlang:system_time(micro_seconds)}
-        ]),
-        {ok, Channel1} = application:get_env(?APP, rmq_channel1),
-        Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = list_to_binary(lists:last(string:tokens(binary_to_list(Topic), "/")))},
-        amqp_channel:cast(Channel1, Publish, #amqp_msg{payload = list_to_binary(Json)});
+    if 
+        string:str(RMQRoutes, binary_to_list(Topic)) > 0 ->
+            Json = mochijson2:encode([
+                {type, <<"chat_event">>},
+                {client_id, ClientId},
+                {username, Username},
+                {topic, Topic},
+                {payload, Payload},
+                {message_id, emqttd_guid:to_hexstr(MessageId)},
+                {cluster_node, node()},
+                {timestamp, erlang:system_time(micro_seconds)}
+            ]),
+            {ok, Channel1} = application:get_env(?APP, rmq_channel1),
+            Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = list_to_binary(lists:last(string:tokens(binary_to_list(Topic), "/")))},
+            amqp_channel:cast(Channel1, Publish, #amqp_msg{payload = list_to_binary(Json)});
     end,
     {ok, Message};
 
@@ -220,20 +221,21 @@ on_message_publish(Message = #mqtt_message{topic = <<"thread/", _/binary>>}, _En
     Topic = Message#mqtt_message.topic,
     Payload = Message#mqtt_message.payload,
     {ok, RMQRoutes} = application:get_env(?APP, routing_config),
-    if(string:str(RMQRoutes, binary_to_list(Topic)) > 0) ->
-        Json = mochijson2:encode([
-            {type, <<"chat_event">>},
-            {client_id, ClientId},
-            {username, Username},
-            {topic, Topic},
-            {payload, Payload},
-            {message_id, emqttd_guid:to_hexstr(MessageId)},
-            {cluster_node, node()},
-            {timestamp, erlang:system_time(micro_seconds)}
-        ]),
-        {ok, Channel1} = application:get_env(?APP, rmq_channel1),
-        Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = list_to_binary(lists:last(string:tokens(binary_to_list(Topic), "/")))},
-        amqp_channel:cast(Channel1, Publish, #amqp_msg{payload = list_to_binary(Json)});
+    if 
+        string:str(RMQRoutes, binary_to_list(Topic)) > 0 ->
+            Json = mochijson2:encode([
+                {type, <<"thread_event">>},
+                {client_id, ClientId},
+                {username, Username},
+                {topic, Topic},
+                {payload, Payload},
+                {message_id, emqttd_guid:to_hexstr(MessageId)},
+                {cluster_node, node()},
+                {timestamp, erlang:system_time(micro_seconds)}
+            ]),
+            {ok, Channel1} = application:get_env(?APP, rmq_channel1),
+            Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = list_to_binary(lists:last(string:tokens(binary_to_list(Topic), "/")))},
+            amqp_channel:cast(Channel1, Publish, #amqp_msg{payload = list_to_binary(Json)});
     end,
     {ok, Message};
 
