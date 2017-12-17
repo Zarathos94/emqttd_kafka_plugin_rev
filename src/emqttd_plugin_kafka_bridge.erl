@@ -264,7 +264,7 @@ on_message_publish(Message = #mqtt_message{topic = <<"event_tracking/", _/binary
     {ok, Channel2} = application:get_env(?APP, rmq_channel2),
     Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"event_log_route">>},
     amqp_channel:cast(Channel2, Publish, #amqp_msg{payload = list_to_binary(Json)}),
-    {ok, Message};
+    {ok, Message}.
 
 
 on_session_created(ClientId, Username, _Env) ->
