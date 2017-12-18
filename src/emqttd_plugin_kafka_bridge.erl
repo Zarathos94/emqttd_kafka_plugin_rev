@@ -244,27 +244,30 @@ on_message_publish(Message = #mqtt_message{topic = <<"thread/", _/binary>>}, _En
                 {ok, Message}
         end;
 
-on_message_publish(Message = #mqtt_message{topic = <<"event_tracking/", _/binary>>}, _Env) ->
-    {ClientId, Username} = Message#mqtt_message.from,
-    MessageId = Message#mqtt_message.id,
-    Topic = Message#mqtt_message.topic,
-    Payload = Message#mqtt_message.payload,
-
-    Json = mochijson2:encode([
-        {type, <<"event_published">>},
-        {client_id, ClientId},
-        {username, Username},
-        {topic, Topic},
-        {payload, Payload},
-        {message_id, emqttd_guid:to_hexstr(MessageId)},
-        {cluster_node, node()},
-        {timestamp, erlang:system_time(micro_seconds)}
-    ]),
-
-    {ok, Channel2} = application:get_env(?APP, rmq_channel2),
-    Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"event_log_route">>},
-    amqp_channel:cast(Channel2, Publish, #amqp_msg{payload = list_to_binary(Json)}),
+on_message_publish(Message, _Env) ->
     {ok, Message}.
+    
+on_message_publish(Message = #mqtt_message{topic = <<"event_tracking/", _/binary>>}, _Env) ->
+        {ClientId, Username} = Message#mqtt_message.from,
+        MessageId = Message#mqtt_message.id,
+        Topic = Message#mqtt_message.topic,
+        Payload = Message#mqtt_message.payload,
+    
+        Json = mochijson2:encode([
+            {type, <<"event_published">>},
+            {client_id, ClientId},
+            {username, Username},
+            {topic, Topic},
+            {payload, Payload},
+            {message_id, emqttd_guid:to_hexstr(MessageId)},
+            {cluster_node, node()},
+            {timestamp, erlang:system_time(micro_seconds)}
+        ]),
+    
+        {ok, Channel2} = application:get_env(?APP, rmq_channel2),
+        Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"event_log_route">>},
+        amqp_channel:cast(Channel2, Publish, #amqp_msg{payload = list_to_binary(Json)}),
+        {ok, Message}..
 
 
 on_session_created(ClientId, Username, _Env) ->
