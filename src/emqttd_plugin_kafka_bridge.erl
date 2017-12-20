@@ -244,9 +244,6 @@ on_message_publish(Message = #mqtt_message{topic = <<"thread/", _/binary>>}, _En
                 {ok, Message}
         end;
 
-on_message_publish(Message, _Env) ->
-    {ok, Message}.
-    
 on_message_publish(Message = #mqtt_message{topic = <<"event_tracking/", _/binary>>}, _Env) ->
         {ClientId, Username} = Message#mqtt_message.from,
         MessageId = Message#mqtt_message.id,
@@ -267,9 +264,11 @@ on_message_publish(Message = #mqtt_message{topic = <<"event_tracking/", _/binary
         {ok, Channel2} = application:get_env(?APP, rmq_channel2),
         Publish = #'basic.publish'{exchange = <<"emqttd">>, routing_key = <<"event_log_route">>},
         amqp_channel:cast(Channel2, Publish, #amqp_msg{payload = list_to_binary(Json)}),
-        {ok, Message}..
+        {ok, Message};
 
-
+on_message_publish(Message, _Env) ->
+        {ok, Message}.
+            
 on_session_created(ClientId, Username, _Env) ->
     Json = mochijson2:encode([
         {type, <<"session_created">>},
