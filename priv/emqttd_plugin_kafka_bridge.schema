@@ -1,39 +1,39 @@
 %%-*- mode: erlang -*-
 %% emqttd_plugin_kafka_bridge config mapping
 
-{mapping, "emqttd_plugin_kafka_bridge.amqp_client.username", "emqttd_plugin_kafka_bridge.username", [
+{mapping, "emq_rmq.amqp_client.username", "emq_rmq.username", [
   {datatype, string}
 ]}.
 
 
-{mapping, "emqttd_plugin_kafka_bridge.amqp_client.password", "emqttd_plugin_kafka_bridge.password", [
+{mapping, "emq_rmq.amqp_client.password", "emq_rmq.password", [
   {datatype, string}
 ]}.
 
-{mapping, "emqttd_plugin_kafka_bridge.amqp_client.virtualhost", "emqttd_plugin_kafka_bridge.virtualhost", [
+{mapping, "emq_rmq.amqp_client.virtualhost", "emq_rmq.virtualhost", [
   {datatype, string}
 ]}.
 
-{mapping, "emqttd_plugin_kafka_bridge.amqp_client.host", "emqttd_plugin_kafka_bridge.host", [
+{mapping, "emq_rmq.amqp_client.host", "emq_rmq.host", [
   {datatype, string}
 ]}.
 
-{mapping, "emqttd_plugin_kafka_bridge.amqp_client.port", "emqttd_plugin_kafka_bridge.port", [
+{mapping, "emq_rmq.amqp_client.port", "emq_rmq.port", [
   {datatype, integer}
 ]}.
 
-{mapping, "emqttd_plugin_kafka_bridge.amqp_client.routing_config", "emqttd_plugin_kafka_bridge.routing_config", [
+{mapping, "emq_rmq.amqp_client.routing_config", "emq_rmq.routing_config", [
   {datatype, string}
 ]}.
 
-{translation, "emqttd_plugin_kafka_bridge.server", fun(Conf) ->
+{translation, "emq_rmq.server", fun(Conf) ->
   
-  Username = cuttlefish:conf_get("emqttd_plugin_kafka_bridge.amqp_client.username", Conf),
-  Passwd = cuttlefish:conf_get("emqttd_plugin_kafka_bridge.amqp_client.password", Conf, ""),
-  Host = cuttlefish:conf_get("emqttd_plugin_kafka_bridge.amqp_client.host", Conf),
-  Port = cuttlefish:conf_get("emqttd_plugin_kafka_bridge.amqp_client.port", Conf),
-  Virtualhost = cuttlefish:conf_get("emqttd_plugin_kafka_bridge.amqp_client.virtualhost", Conf),
-  RoutingConfig = cuttlefish:conf_get("emqttd_plugin_kafka_bridge.amqp_client.routing_config", Conf),
+  Username = cuttlefish:conf_get("emq_rmq.amqp_client.username", Conf),
+  Passwd = cuttlefish:conf_get("emq_rmq.amqp_client.password", Conf, ""),
+  Host = cuttlefish:conf_get("emq_rmq.amqp_client.host", Conf),
+  Port = cuttlefish:conf_get("emq_rmq.amqp_client.port", Conf),
+  Virtualhost = cuttlefish:conf_get("emq_rmq.amqp_client.virtualhost", Conf),
+  RoutingConfig = cuttlefish:conf_get("emq_rmq.amqp_client.routing_config", Conf),
   [
    {host, Host},
    {port, Port},
