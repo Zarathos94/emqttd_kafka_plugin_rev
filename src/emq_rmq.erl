@@ -22,7 +22,7 @@
 %%%
 %%% @end
 %%%-----------------------------------------------------------------------------
--module(emqttd_plugin_kafka_bridge).
+-module(emq_rmq).
 
 -include("../../emqttd/include/emqttd.hrl").
 
