@@ -18,11 +18,11 @@
 %%% SOFTWARE.
 %%%-----------------------------------------------------------------------------
 %%% @doc
-%%% emqttd_plugin_kafka_bridge.
+%%% emq_rmq.
 %%%
 %%% @end
 %%%-----------------------------------------------------------------------------
--module(emqttd_plugin_kafka_bridge_sup).
+-module(emq_rmq_sup).
 
 -behaviour(supervisor).
 
