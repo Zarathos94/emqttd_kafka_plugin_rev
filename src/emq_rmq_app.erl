@@ -18,11 +18,11 @@
 %%% SOFTWARE.
 %%%-----------------------------------------------------------------------------
 %%% @doc
-%%% emqttd_plugin_kafka_bridge.
+%%% emq_rmq.
 %%%
 %%% @end
 %%%-----------------------------------------------------------------------------
--module(emqttd_plugin_kafka_bridge_app).
+-module(emq_rmq).
 
 -behaviour(application).
 
@@ -34,13 +34,13 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    {ok, Sup} = emqttd_plugin_kafka_bridge_sup:start_link(),
+    {ok, Sup} = emq_rmq_sup:start_link(),
     %%emqttd_plugin_kafka_bridge:load(application:get_all_env()),
-    emqttd_plugin_kafka_bridge:load(),
-    emqttd_plugin_kafka_bridge_config:register(),
+    emq_rmq:load(),
+    emq_rmq_config:register(),
     {ok, Sup}.
 
 stop(_State) ->
-    emqttd_plugin_kafka_bridge_config:unregister(),
-    emqttd_plugin_kafka_bridge:unload().
+    emq_rmq_config:unregister(),
+    emq_rmq:unload().
 
