@@ -13,9 +13,9 @@
 %% See the License for the specific language governing permissions and
 %% limitations under the License.
 %%--------------------------------------------------------------------
--module (emqttd_plugin_kafka_bridge_config).
+-module (emq_rmq).
 
--define(APP, emqttd_plugin_kafka_bridge).
+-define(APP, emq_rmq).
 
 -export ([register/0, unregister/0]).
 
@@ -55,10 +55,10 @@ unregister_config() ->
 %%--------------------------------------------------------------------
 keys() ->
         [
-        "emqttd_plugin_kafka_bridge.amqp_client.username", 
-        "emqttd_plugin_kafka_bridge.amqp_client.password", 
-        "emqttd_plugin_kafka_bridge.amqp_client.virtualhost",
-        "emqttd_plugin_kafka_bridge.amqp_client.host", 
-        "emqttd_plugin_kafka_bridge.amqp_client.port",
-        "emqttd_plugin_kafka_bridge.amqp_client.routing_config"
+        "emq_rmq.amqp_client.username", 
+        "emq_rmq.amqp_client.password", 
+        "emq_rmq.amqp_client.virtualhost",
+        "emq_rmq.amqp_client.host", 
+        "emq_rmq.amqp_client.port",
+        "emq_rmq.amqp_client.routing_config"
         ].
