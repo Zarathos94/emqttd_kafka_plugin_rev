@@ -13,7 +13,7 @@
 %% See the License for the specific language governing permissions and
 %% limitations under the License.
 %%--------------------------------------------------------------------
--module (emq_rmq).
+-module (emq_rmq_config).
 
 -define(APP, emq_rmq).
 
